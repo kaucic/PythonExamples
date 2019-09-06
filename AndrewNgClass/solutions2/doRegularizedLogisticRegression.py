@@ -11,16 +11,18 @@ from scipy import optimize,special
 import matplotlib.pyplot as plt
 
 # Determine which DS to use
-DS = 2
+DS = 1
 if (DS == 1):
     FILENAME = "./Data/ex2data1.txt"
     lamb = 0.0
     alpha = 3.0
-    iters = 5000
+   
 else:
     # POLYNOMIIAL LINEAR REGRESSION NOT IMPLEMENTED
     FILENAME = "./Data/ex2data2.txt"
     lamb = 0.01
+
+iters = 5000
 
 def readFile(fname):
     data = np.genfromtxt(fname,delimiter=",")
@@ -163,7 +165,7 @@ def findMinTheta(orig_theta,x,y,num_iter):
     """
     theta = np.copy(orig_theta)
     result = sp.optimize.minimize(costAndGradientFunction,x0=theta,args=(x,y),method='L-BFGS-B',jac=True)  
-    print result
+    print (result)
     return result.x, result.fun
 
 def mapFeature( X1, X2 ):
@@ -196,7 +198,7 @@ if (DS == 1):
         scales = np.ones((n-1,))
     else:
         scaledX, scales = normalizeVals(vals[:,:-1])
-        print "scales=", scales
+        print ("scales=", scales)
 
     # append bias = 1 to the sample vectors
     X = np.c_[np.ones((m,1)), scaledX]
@@ -210,7 +212,7 @@ else:
     
     plotData(raw_vals[:,:-1],Y)
     
-print "number of samples = %d number of parameters = %d" % (m,n)
+print ("number of samples = %d number of parameters = %d" % (m,n))
 
 params = np.zeros((n,))
 
@@ -218,20 +220,20 @@ params = np.zeros((n,))
 h = hypothesis(params,X)
 cost = computeCost(params,X,Y)
 #print "h=", h
-print "Initial cost=", cost
+print ("Initial cost=", cost)
 
 # Look at using various optimization routines including Gradient Descent 
 if (0):
     # run Gradient Descent algorithm
     theta, cost = gradientDescent(params,X,Y,alpha,iters)
-    print "starting cost = %f final cost = %f" % (cost[0],cost[-1])
+    print ("starting cost = %f final cost = %f" % (cost[0],cost[-1]))
     plotCost(cost)
 else:
     # run fminunc or L-BFGS-B
     theta, cost = findMinTheta(params,X,Y,iters)
-    print "final cost = %f" % cost
+    print ("final cost = %f" % cost)
 
-print "final theta=", theta
+print ("final theta=", theta)
 
 # predict new values for test data
 if (DS == 1):
@@ -239,7 +241,7 @@ if (DS == 1):
     x1 = np.array([1.0, 45.0, 85.0])
     x1[1:] = x1[1:] / scales # exclude intercept unit
     predict1 = hypothesis(theta,x1) 
-    print "predict1=", predict1
+    print ("predict1=", predict1)
 else:
     plotData(raw_vals[:,0:2],Y)
     plotContour(theta)
