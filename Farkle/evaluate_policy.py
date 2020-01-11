@@ -1,5 +1,10 @@
 
 import numpy as np
+
+import matplotlib
+matplotlib.rcParams['mathtext.fontset'] = 'stix'
+matplotlib.rcParams['font.family'] = 'STIXGeneral'
+
 import matplotlib.pyplot as plt
 
 def throw(i = None):
@@ -203,20 +208,23 @@ histogram = navigate(None, 1, 0, policy = find_next_action_conservative_plus)
 
 rewards = np.sort([key for key in histogram.keys()])
 print("Rewards: ", rewards)
-#probabilities = [histogram[key] for key in rewards]
-#print("Probabilities: ", probabilities)
 print("Probability of Farkle: ", histogram[0])
 E = 0
 for reward in histogram:
     E += reward * histogram[reward]
 print("Expected reward: ", E)
 
-text = "Log of Reward Distribution for Policy"
+text = "Log of Reward Distribution for ""Conservative Plus"" Policy"
 plt.figure(text, figsize=(13, 8))
-plt.bar(histogram.keys(), histogram.values(), width = 40)
+plt.bar(histogram.keys(), histogram.values(), width = 40, label = "$log(P)$")
 plt.yscale("log")
 plt.title(text)
-plt.xlabel("Reward")
-plt.ylabel("log(P(Reward))")
+plt.xlabel("$R$")
+plt.xticks(rewards)
+plt.ylim((1e-5, 1))
+plt.ylabel("$\log(P(R))$")
 plt.grid("on")
+plt.plot(E, plt.ylim()[0], "r*", clip_on = False, label = "$E[R] = %2.2f$" % E)
+plt.legend()
+plt.savefig(text + (".%s" % "pdf"), bbox_inches='tight')
 plt.show()
