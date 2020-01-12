@@ -108,70 +108,137 @@ def find_next_action_conservative(state, reward, sigma):
         else:
             return (0, 100 * (state[1] - 7))
 
+
+global p1, p2, p3, R1, R2, R3
+
+p1 = 1./3
+R1 = 40
+def compute_E1_total(R):
+    return R*p1 + R1
+
+p2 = 5./9
+R2 = 54
+def compute_E2_total(R):
+    return R*p2 + R2
+
+p3 = 156./216
+R3 = 92.7
+def compute_E3_total(R):
+    return R*p3 + R3
+
 # One final throw if after the first throw the reward is 50,
 # or if three dice are available to throw and the reward is not greater than 300
-def find_next_action_conservative_plus(state, reward, sigma):
+def find_next_action_manual_best(state, reward, sigma):
+    
     if state[0] == 1:
         if state[1] == 1:
-            return (k, 50)
+            if reward + 50 <= compute_E3_total(reward + 50):
+                return (3, 50)
+            else:
+                return (0, 50)
         if state[1] == 2:
-            return (k, 100)
+            if reward + 100 <= compute_E3_total(reward + 100):
+                return (3, 100)
+            else:
+                return (0, 100)
         
     elif state[0] == 2:
         if state[1] == 1:
-            return (0, 50)
+            if reward + 50 <= compute_E1_total(reward + 50):
+                return (1, 50)
+            else:
+                return (0, 50)
+
         if state[1] == 2:
             return (0, 100)
+
         if state[1] == 3:
-            return (0, 100)
+            if reward + 100 <= compute_E3_total(reward + 100):
+                return (3, 100)
+            else:
+                return (0, 100)
+
         if state[1] == 4:
-            return (0, 150)
+            if reward + 150 <= compute_E3_total(reward + 150):
+                return (3, 150)
+            else:
+                return (0, 150)
+
         if state[1] == 5:
-            return (0, 200)
+            if reward + 200 <= compute_E3_total(reward + 200):
+                return (3, 200)
+            else:
+                return (0, 200)
     
     else: # state[0] == 3:
         if state[1] == 1:
-            if reward > 0:
-                return (0, 50)
-            else:
+            if reward + 50 <= compute_E2_total(reward + 50):
                 return (2, 50)
+            else:
+                return (0, 50)
+
         elif state[1] == 2:
-            return (0, 100)
+            if reward + 100 <= compute_E2_total(reward + 100):
+                return (2, 100)
+            else:
+                return (0, 100)
+
         elif state[1] == 3:
-            return (0, 100)
+            E2 = compute_E2_total(reward + 50)
+            E1 = compute_E1_total(reward + 100)
+            if E2 > E1:
+                if reward + 100 <= E2:
+                    return (2, 50)
+                else:
+                    return (0, 100)
+            else:
+                if reward + 100 <= E1:
+                    return (1, 100)
+                else:
+                    return(0, 100)
+
         elif state[1] == 4:
             return (0, 150)
+
         elif state[1] == 5:
             return (0, 200)
+
         elif state[1] == 6:
-            if reward > 0:
-                return (0, 200)
-            else:
+            if reward + 200 <= compute_E3_total(reward + 200):
                 return (3, 200)
+            else:
+                return (0, 200)
+
         elif state[1] == 7:
-            if reward > 0:
-                return (0, 200)
-            else:
+            if reward + 200 <= compute_E3_total(reward + 200):
                 return (3, 200)
+            else:
+                return (0, 200)    
+
         elif state[1] == 8:
-            if reward > 0:
-                return (0, 250)
-            else:
+            if reward + 250 <= compute_E3_total(reward + 250):
                 return (3, 250)
+            else:
+                return (0, 250)
+
         elif state[1] == 9:
-            if reward > 0:
-                return (0, 300)
-            else:
+            if reward + 300 <= compute_E3_total(reward + 300):
                 return (3, 300)
+            else:
+                return (0, 300)    
+
         elif state[1] == 10:
-            if reward > 0:
-                return (0, 300)
-            else:
+            if reward + 300 <= compute_E3_total(reward + 300):
                 return (3, 300)
+            else:
+                return (0, 300)
+
         elif state[1] == 11:
             return (0, 400)
+
         elif state[1] == 12:
             return (0, 500)
+
         else: # state[1] == 13
             return (0, 600)
     
@@ -204,7 +271,7 @@ def navigate(i, probability, reward, sigma = (), histogram = None, policy = find
     
     return histogram
 
-histogram = navigate(None, 1, 0, policy = find_next_action_conservative_plus)
+histogram = navigate(None, 1, 0, policy = find_next_action_manual_best)
 
 rewards = np.sort([key for key in histogram.keys()])
 print("Rewards: ", rewards)
