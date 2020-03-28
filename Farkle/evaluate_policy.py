@@ -122,7 +122,8 @@ def compute_E2_total(R):
     return R*p2 + R2
 
 p3 = 156./216
-R3 = 92.7
+#R3 = 92.7
+R3 = 92.72940957933241
 def compute_E3_total(R):
     return R*p3 + R3
 
