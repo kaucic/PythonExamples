@@ -1,3 +1,10 @@
+# Probabilites for Farkleing with X Dice
+# 6 --  2.31%
+# 5 --  7.72%
+# 4 -- 15.74%
+# 3 -- 27.78%
+# 2 -- 44.44%
+# 1 -- 66.67%
 
 import numpy as np
 
@@ -48,7 +55,7 @@ def find_next_action_min_greedy(state, reward, sigma):
         else:
             return (0, 50 * (state[1] - 1))
     
-    else:
+    else:  # state[0] == 3 dice
         if state[1] < 3:
             return (2, 50 * state[1])
         elif state[1] < 6:
@@ -71,7 +78,7 @@ def find_next_action_max_greedy(state, reward, sigma):
         else:
             return (0, 50 * (state[1] - 1))
     
-    else:
+    else:  # state[0] == 3 dice
         if state[1] < 3:
             return (2, 50 * state[1])
         elif state[1] < 5:
@@ -96,7 +103,7 @@ def find_next_action_conservative(state, reward, sigma):
         else:
             return (0, 50 * (state[1] - 1))
     
-    else:
+    else:  # state[0] == 3 dice
         if state[1] < 3:
             return (0, 50 * state[1])
         elif state[1] < 6:
@@ -111,21 +118,64 @@ def find_next_action_conservative(state, reward, sigma):
 
 global p1, p2, p3, R1, R2, R3
 
-p1 = 1./3
-R1 = 40
+pnf1 = 1./3
+p1 = 0.31739496
+R1 = 35.24041445
 def compute_E1_total(R):
-    return R*p1 + R1
+    E = 1./6*max(R+50,compute_E3_total(R+50)) + 1./6*max(R+100,compute_E3_total(R+100))
+    return E
 
-p2 = 5./9
-R2 = 54
+pnf2 = 5./9
+p2 = 0.55218238
+R2 = 52.12393241
 def compute_E2_total(R):
-    return R*p2 + R2
+    E = ( 2./9*max(R+50,compute_E1_total(R+50)) + 2./9*max(R+100,compute_E1_total(R+100)) +
+    1./36*max(R+100,compute_E3_total(R+100)) +  1./18*max(R+150,compute_E3_total(R+150)) +
+    1./36*max(R+200,compute_E3_total(R+200)) )
+    return E
 
-p3 = 156./216
-#R3 = 92.7
-R3 = 92.72940957933241
+pnf3 = 156./216
+#R3 = 83.56481
+#R3 = 92.72940957933241
+#p3 = 0.5006001371742113
+p3 = pnf3
+R3 = 83.56481
 def compute_E3_total(R):
-    return R*p3 + R3
+    return p3*R + R3
+
+
+# plot the expected value function for i dice
+def plot_expected_value_function(i):
+    rewards = list( range(0,901,50) )
+    if i == 1:
+        E = [compute_E1_total(r) for r in rewards]
+             
+    elif i == 2:
+        E = [compute_E2_total(r) for r in rewards]
+    
+    else:
+        E = [compute_E3_total(r) for r in rewards]
+        
+    # Use least squares to solve for reward function linear coefficients
+    m = len(rewards)
+    y = np.array(E)
+    A = np.c_[np.ones((m,1)), rewards]
+    coeffs = np.dot(np.linalg.pinv(A), y)
+    print (coeffs)
+    
+    text = "Expected Value function for %d dice" % i
+    plt.figure(text, figsize=(13, 8))
+    plt.yscale("linear")
+    plt.title(text)
+    plt.xlabel("$R$")
+    plt.xticks(rewards)
+    plt.ylabel("Expected Value")
+    plt.plot(rewards, E)
+    plt.plot(rewards, rewards)
+    plt.show()
+
+    return rewards,E 
+
 
 # One final throw if after the first throw the reward is 50,
 # or if three dice are available to throw and the reward is not greater than 300
@@ -151,7 +201,10 @@ def find_next_action_manual_best(state, reward, sigma):
                 return (0, 50)
 
         if state[1] == 2:
-            return (0, 100)
+            if reward + 100 <= compute_E1_total(reward + 100):
+                return (1, 100)
+            else:
+                return (0, 100)
 
         if state[1] == 3:
             if reward + 100 <= compute_E3_total(reward + 100):
@@ -171,7 +224,7 @@ def find_next_action_manual_best(state, reward, sigma):
             else:
                 return (0, 200)
     
-    else: # state[0] == 3:
+    else: # state[0] == 3 dice
         if state[1] == 1:
             if reward + 50 <= compute_E2_total(reward + 50):
                 return (2, 50)
@@ -272,6 +325,23 @@ def navigate(i, probability, reward, sigma = (), histogram = None, policy = find
     
     return histogram
 
+def plot_reward_distribution(rewards,histogram):
+    text = "Log of Reward Distribution for ""Conservative Plus"" Policy"
+    plt.figure(text, figsize=(13, 8))
+    plt.bar(histogram.keys(), histogram.values(), width = 40, label = "$log(P)$")
+    plt.yscale("log")
+    plt.title(text)
+    plt.xlabel("$R$")
+    plt.xticks(rewards)
+    plt.ylim((1e-5, 1))
+    plt.ylabel("$\log(P(R))$")
+    plt.grid("on")
+    plt.plot(E, plt.ylim()[0], "r*", clip_on = False, label = "$E[R] = %2.2f$" % E)
+    plt.legend()
+    plt.savefig(text + (".%s" % "pdf"), bbox_inches='tight')
+    plt.show()
+
+# Start of main program
 histogram = navigate(None, 1, 0, policy = find_next_action_manual_best)
 
 rewards = np.sort([key for key in histogram.keys()])
@@ -282,17 +352,7 @@ for reward in histogram:
     E += reward * histogram[reward]
 print("Expected reward: ", E)
 
-text = "Log of Reward Distribution for ""Conservative Plus"" Policy"
-plt.figure(text, figsize=(13, 8))
-plt.bar(histogram.keys(), histogram.values(), width = 40, label = "$log(P)$")
-plt.yscale("log")
-plt.title(text)
-plt.xlabel("$R$")
-plt.xticks(rewards)
-plt.ylim((1e-5, 1))
-plt.ylabel("$\log(P(R))$")
-plt.grid("on")
-plt.plot(E, plt.ylim()[0], "r*", clip_on = False, label = "$E[R] = %2.2f$" % E)
-plt.legend()
-plt.savefig(text + (".%s" % "pdf"), bbox_inches='tight')
-plt.show()
+#plot_reward_distribution(rewards,histogram)
+
+
+
