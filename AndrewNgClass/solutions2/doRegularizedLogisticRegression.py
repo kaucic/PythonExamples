@@ -2,27 +2,39 @@
 """
 Created on Wed Nov 11 11:43:54 2015
 
+Exercise 2
+
 @author: Kimberly
 """
+
+import os
+import logging
 
 import numpy as np
 import scipy as sp
 from scipy import optimize,special
 import matplotlib.pyplot as plt
 
+#logging.basicConfig(level=os.environ.get("LOGLEVEL","INFO"))
+logging.basicConfig(level=logging.INFO)
+
+log = logging.getLogger(__name__)
+
 # Determine which DS to use
-DS = 1
+DS = 2
 if (DS == 1):
     FILENAME = "./Data/ex2data1.txt"
     lamb = 0.0
     alpha = 3.0
    
 else:
-    # POLYNOMIIAL LINEAR REGRESSION NOT IMPLEMENTED
+    # plotContour doesnt work for POLYNOMIIAL LINEAR REGRESSION
     FILENAME = "./Data/ex2data2.txt"
     lamb = 0.01
 
 iters = 5000
+
+log.info('FILENAME is %s', FILENAME)
 
 def readFile(fname):
     data = np.genfromtxt(fname,delimiter=",")
@@ -45,8 +57,13 @@ def plotData(x,y):
     plt.scatter( negatives[:, 0], negatives[:, 1], c='y', marker='o', s=40, linewidths=1, label="Not admitted" )
     plt.scatter( positives[:, 0], positives[:, 1], c='b', marker='+', s=40, linewidths=2, label="Admitted" )
 
-    plt.xlabel("Exam 1 score")
-    plt.ylabel("Exam 2 score")
+    if (DS == 1):
+        plt.xlabel("Exam 1 score")
+        plt.ylabel("Exam 2 score")
+    else:
+        plt.xlabel("Microchip Test 1")
+        plt.ylabel("Microchip Test 2")
+        
     #plt.xlim([25, 115])
     #plt.ylim([25, 115])
     plt.legend()
@@ -68,11 +85,11 @@ def plotContour(theta):
         for j in range(0, len(v)):
             mapped = mapFeature( np.array([u[i]]), np.array([v[j]]) )
             z[i,j] = mapped.dot( theta )
-            z = z.transpose()
             
-            u, v = np.meshgrid( u, v )
-            plt.contour( u, v, z, [0.0, 0.0], label='Decision Boundary' )
-            plt.show()
+    z = z.transpose()
+    u, v = np.meshgrid( u, v )
+    plt.contour( u, v, z, [0.0, 0.0], label='Decision Boundary' )
+    plt.show()
     
 def normalizeVals(x):
     """
@@ -244,4 +261,4 @@ if (DS == 1):
     print ("predict1=", predict1)
 else:
     plotData(raw_vals[:,0:2],Y)
-    plotContour(theta)
+    #plotContour(theta)

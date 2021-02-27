@@ -2,12 +2,18 @@
 """
 Created on Wed Nov 11 11:43:54 2015
 
+Exercise 3
+
 @author: Kimberly
 """
 
+import logging
+ 
 import numpy as np
 import scipy as sp
-from scipy import optimize,special
+#from scipy import optimize,special
+import scipy.io as sio
+from PIL import Image
 import matplotlib.pyplot as plt
 
 lamb = 0.1
@@ -31,7 +37,7 @@ def displayData(x,thetas=None):
     width = 20
     rows, cols = 10, 10
 
-    out = np.zeros((width*rows,width*cols))
+    im_out = np.zeros((width*rows,width*cols))
     rand_indices = np.random.permutation(m)[0:rows*cols]
 
     counter = 0
@@ -39,9 +45,10 @@ def displayData(x,thetas=None):
         for c in range(0, cols):
             start_x = c * width
             start_y = r * width
-            out[start_x:start_x+width,start_y:start_y+width] = x_raw[rand_indices[counter]].reshape(width, width).T
+            im_out[start_x:start_x+width,start_y:start_y+width] = x_raw[rand_indices[counter]].reshape(width, width).T
             counter += 1
-    img = sp.misc.toimage(out)
+    #img = sp.misc.toimage(im_out)
+    img = Image.fromarray(im_out*255)
 
     # display image of digits
     figure = plt.figure()
@@ -55,7 +62,7 @@ def displayData(x,thetas=None):
             result = classifySample(thetas,x[idx])
             result_matrix.append(result)
         result_matrix = np.array(result_matrix).reshape(rows,cols).T
-        print result_matrix
+        print (result_matrix)
 
     plt.show( )
 
@@ -134,8 +141,8 @@ def gradientDescent(orig_theta,x,y,alpha,num_iter):
         grad = computeGradient(theta,x,y)
         theta -= (alpha * grad)
         cost[i] = computeCost(theta,x,y)
-        #print "Iter = %d cost = %f" % (i,cost[i])
-        #print "theta=", theta
+        #print ("Iter = ", i, " cost = ", cost[i])
+        #print ("theta= ", theta)
     return theta,cost
 
 def findMinTheta(orig_theta,x,y,num_iter):
@@ -150,8 +157,8 @@ def findMinTheta(orig_theta,x,y,num_iter):
     """
     theta = np.copy(orig_theta)
     result = sp.optimize.minimize(costAndGradientFunction,x0=theta,args=(x,y),method='L-BFGS-B',jac=True,options={'maxiter': num_iter}) 
-    print "success=", result.success
-    #print result
+    print ("success= ", result.success)
+    #print (result)
     return result.x, result.fun
 
 def predictOneVsAll(thetas,x,y):
@@ -171,7 +178,7 @@ def predictOneVsAll(thetas,x,y):
     for i in range(0,m):
         prediction = classifySample(thetas,X[i])
         actual = y[i] % K # Digit 0 is coded as k = 10
-        # print "prediction = %d actual = %d" % (prediction, actual)
+        # print ("prediction = ", prediction, " actual = ", actual)
         if actual == prediction:
             correct += 1
     accuracy = correct / float(m) * 100.0
@@ -194,11 +201,11 @@ def classifySample(thetas,samp):
 # Start main program    
 np.set_printoptions(precision=6, linewidth=200)
 
-vals = sp.io.loadmat("./Data/ex3data1.mat")
+vals = sio.loadmat("./Data/ex3data1.mat")
 Xvals, Y = vals['X'], vals['y']
 m = len(Xvals)
 n = len(Xvals[0]) + 1
-print "number of samples = %d number of parameters = %d" % (m,n)
+print ("number of samples = ", m, " number of parameters = ", n)
 
 # Look at scaling the data versus not scaling
 if (1):
@@ -206,7 +213,7 @@ if (1):
     scales = np.ones((n-1,))
 else:
     scaledX, scales = normalizeVals(Xvals)
-#print "scales=", scales
+#print ("scales= ", scales)
 
 # append bias = 1 to the sample vectors
 X = np.c_[np.ones((m,1)), scaledX]
@@ -214,7 +221,7 @@ X = np.c_[np.ones((m,1)), scaledX]
 displayData(X)
 
 # Train K = 10 separate One versus All classifiers
-K = max(Y)
+K = np.max(Y)
 thetas = np.zeros((K,n))
 costs = np.zeros((K,))
 for k in range(1,K+1):
@@ -222,13 +229,13 @@ for k in range(1,K+1):
     newY =  ((Y == k) + 0).reshape(-1)    
     params = np.zeros((n,))
     theta, cost = findMinTheta(params,X,newY,iters)
-    print "%d Cost: %.5f" % (k,cost)
-    #print "final theta=", theta[0:5]
+    print (k, " Cost: ", cost)
+    #print ("final theta= ", theta[0:5])
     thetas[k_mod,:] = theta
     costs[k_mod] = cost
     
 # predict new values for test data
 accuracy = predictOneVsAll(thetas,X,Y)
-print "Accuracy: %.2f%%" % accuracy
+print ("Accuracy: ", accuracy)
 
 displayData(X,thetas)

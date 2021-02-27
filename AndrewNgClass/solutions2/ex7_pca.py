@@ -7,6 +7,7 @@ import sys
 '''For scientific computing'''
 from numpy import *
 import scipy.misc, scipy.io, scipy.optimize
+import imageio
 
 '''For plotting'''
 from matplotlib import pyplot, cm, colors, lines
@@ -73,7 +74,7 @@ def part2_2():
 
 
 	error = 1 - (sum( S[:1]) / sum( S))
-	print error
+	print (error)
 
 	mu = mu.reshape( 1, 2)[0]
 	mu_1 = mu + 1.5 * S[0] * U[:, 0]
@@ -100,7 +101,7 @@ def part2_3():
 
 	K = 1
 	Z = projectData( X_norm, U, K )
-	print Z[0] # Should be 1.481
+	print (Z[0]) # Should be 1.481
 
 	X_rec = recoverData( Z, U, K )
 
@@ -138,32 +139,28 @@ def part2_4():
 	pyplot.show(  )
 
 def partExtra():
-	A = scipy.misc.imread( "./Data/bird_small.png" )
-	A 			= A / 255.0
-	img_size 	= shape( A )
-
-	X = A.reshape( img_size[0] * img_size[1], 3 )
-	K = 16
-	max_iters = 10
-
-
-	initial_centroids = kMeansInitCentroids( X, K )
-	centroids, idx = runkMeans( X, initial_centroids, max_iters )
-
-
-	fig = pyplot.figure()
+    A = imageio.imread( "./Data/bird_small.png" )	
+	#A = scipy.misc.imread( "./Data/bird_small.png" )
+    A 			= A / 255.0
+    img_size 	= shape( A )
+    
+    X = A.reshape( img_size[0] * img_size[1], 3 )
+    K = 16
+    max_iters = 10
+    
+    initial_centroids = kMeansInitCentroids( X, K )
+    centroids, idx = runkMeans( X, initial_centroids, max_iters )
+    
+    fig = pyplot.figure()
 	# axis = fig.add_subplot( 111, projection='3d' )
 	# axis.scatter( X[:1000, 0], X[:1000, 1], X[:1000, 2], c=idx[:1000], marker='o' )
 	# pyplot.show()
-
-	X_norm, mu, sigma = Util.featureNormalize( X )
-
-	U, S = pca( X_norm )
-	Z = projectData( X_norm, U, 2 )
-	pyplot.scatter( Z[:100, 0], Z[:100, 1], c='r', marker='o' )
-	pyplot.show()
-
-
+    
+    X_norm, mu, sigma = Util.featureNormalize( X )
+    U, S = pca( X_norm )
+    Z = projectData( X_norm, U, 2 )
+    pyplot.scatter( Z[:100, 0], Z[:100, 1], c='r', marker='o' )
+    pyplot.show()
 
 def main():
 	part2_1()

@@ -73,7 +73,7 @@ def part2_1():
 def part2_2():
 	data  = genfromtxt("./Data/ex2data2.txt",delimiter = ',')
 	X 	  = mapFeature( data[:, 0], data[:, 1] )
-	print X
+	print (X)
 
 def part2_3():
 	data  = genfromtxt("./Data/ex2data2.txt",delimiter = ',')
@@ -81,7 +81,7 @@ def part2_3():
 	X 	  = mapFeature( data[:, 0], data[:, 1] )
 	theta = zeros( shape(X)[1] )
 	lamda = 1.0
-	print computeCost( theta, X, y, lamda )
+	print (computeCost( theta, X, y, lamda ))
 
 	theta, cost = findMinTheta( theta, X, y, lamda )
 

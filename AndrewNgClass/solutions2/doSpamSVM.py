@@ -5,10 +5,13 @@ Created on Wed Nov 11 11:43:54 2015
 @author: Robert Kaucic
 """
 
+import logging
+
 import numpy as np
 import scipy as sp
 from scipy import optimize,special
-from sklearn import svm, grid_search
+#from sklearn import svm, grid_search
+from sklearn import svm
 import re
 import csv
 import nltk
@@ -104,7 +107,7 @@ def computeAccuracy(lsvm,x,y):
     predictions = lsvm.predict(x)
     num_correct = sum (predictions == y)
     accuracy = 100.0 * num_correct / len(y)
-    print "accuracy =", accuracy
+    print ("accuracy =", accuracy)
 
     return accuracy
     
@@ -121,8 +124,8 @@ Vocab_set = getVocabSet('./Data/vocab.txt')
 #print Vocab_set
 
 features = emailFeatures(processed,Vocab_set)
-print "len of features is", len(features)
-print "num features is", sum(features)
+print ("len of features is", len(features))
+print ("num features is", sum(features))
   
 vals = sp.io.loadmat('./Data/spamTrain.mat')
 X, y = vals['X'], vals['y']
@@ -136,9 +139,9 @@ Y_test = y_test.ravel()
 if (0):
     linear_svm = svm.SVC(C=0.1,kernel='linear',verbose=False)
     linear_svm.fit(X,Y)
-    print "num support vecs =", linear_svm.n_support_
-    print "coefs =", linear_svm.coef_
-    print "intercept =", linear_svm.intercept_
+    print ("num support vecs =", linear_svm.n_support_)
+    print ("coefs =", linear_svm.coef_)
+    print ("intercept =", linear_svm.intercept_)
     pickle.dump(linear_svm,open("linear_svm.svm","wb"))
 else:
     linear_svm = pickle.load(open("linear_svm.svm","rb"))
@@ -157,18 +160,20 @@ sorted_indices = np.argsort(svecs)
 # Flop (key,value) pair in Vocab_set to (value,key) -- it is a one-to-one mapping
 Vocab_Set_inv = dict( (v, k) for (k, v) in Vocab_set.items() )
 for i in sorted_indices[0:15]:
-	print Vocab_Set_inv[i]
-print ""
+	print (Vocab_Set_inv[i])
+print ("")
 
 # Do end-to-end spam classification of an email
 with open('./Data/spamSample2.txt', 'r' ) as f:
     emails = f.read()
 
 processed = processEmail(emails)
-features = emailFeatures(processed,Vocab_set)
+raw_features = emailFeatures(processed,Vocab_set)
+# Create a [single sample X num_features] matrix
+features = raw_features.reshape(1,len(raw_features))
 
-print emails 
-print processed
+print (emails) 
+print (processed)
 
 prediction = linear_svm.predict(features)
-print "prediction=", prediction
+print ("prediction=", prediction)

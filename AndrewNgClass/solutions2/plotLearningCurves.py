@@ -5,6 +5,8 @@ Created on Wed Nov 11 11:43:54 2015
 @author: Robert Kaucic
 """
 
+import logging
+
 import numpy as np
 import scipy as sp
 from scipy import optimize,special
@@ -202,7 +204,7 @@ def findMinTheta(orig_theta,x,y,lamb,num_iter):
     """
     theta = np.copy(orig_theta)
     result = sp.optimize.minimize(costAndGradientFunction,x0=theta,args=(x,y,lamb),method='L-BFGS-B',jac=True,options={'maxiter': num_iter})  
-    print "success=", result.success    
+    print ("success=", result.success)    
     #print result
     return result.x, result.fun
 
@@ -217,7 +219,7 @@ m = len(Xraw)
 n = len(Xraw[0]) + 1 # add 1 for bias term
 mv = len(Xv)
 mt = len(Xt)
-print "number of samples = %d number of parameters = %d" % (m,n)
+print ("number of samples = %d number of parameters = %d" % (m,n))
 
 Praw = polyFeatures(Xraw,DEGREE)
 Pv = polyFeatures(Xv,DEGREE)
@@ -234,7 +236,7 @@ else:
     scaledXval = Pv / scales
     scaledXtest = Pt / scales
     
-print "scales=", scales
+print ("scales=", scales)
 
 # append bias = 1 to the sample vectors
 X = np.c_[np.ones((m,1)), scaledX]
@@ -252,10 +254,10 @@ if (not poly):
     # test out functions
     test_theta = np.array([1.0, 1.0])
     initial_cost = computeCost(test_theta,X,Y,1.0)
-    print "Initial cost=", initial_cost
+    print ("Initial cost=", initial_cost)
 
     initial_grad = computeGradient(test_theta,X,Y,1.0)
-    print "Initial grad=", initial_grad
+    print ("Initial grad=", initial_grad)
 else:
     n = DEGREE + 1
     test_theta = np.zeros((n,))
@@ -264,21 +266,21 @@ else:
 if (0):
     # run Gradient Descent algorithm
     Theta, cost = gradientDescent(test_theta,X,Y,LAMB,alpha,iters)
-    print "starting cost = %f final cost = %f" % (cost[0],cost[-1])
-    print "final theta=", Theta
+    print ("starting cost = %f final cost = %f" % (cost[0],cost[-1]))
+    print ("final theta=", Theta)
     plotCost(cost)
 else:
     # run fminunc or L-BFGS-B
     Theta, cost = findMinTheta(test_theta,X,Y,LAMB,iters)
-    print "final cost = %f" % cost
-    print "final theta=", Theta
+    print ("final cost = %f" % cost)
+    print ("final theta=", Theta)
     # Compute error for test set
     test_err = computeCost(Theta,Xtest,Ytest,0.0)
-    print "test error = %f" % test_err
+    print ("test error = %f" % test_err)
 
 # Compute regularized least squares solution
 exact = normalEquation(X,Y,LAMB)
-print "exact theta=", exact
+print ("exact theta=", exact)
 
 plotFit(Theta,X,Y)
 

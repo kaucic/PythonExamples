@@ -2,12 +2,17 @@
 """
 Created on Wed Nov 11 11:43:54 2015
 
+Exercise 4
+
 @author: Robert Kaucic
 """
 
+import logging
+
 import numpy as np
 import scipy as sp
-from scipy import optimize,special
+#from scipy import optimize,special
+from PIL import Image
 import matplotlib.pyplot as plt
 
 lamb = 1.0
@@ -32,7 +37,7 @@ def displayData(x,thetas=None):
     width = 20
     rows, cols = 10, 10
 
-    out = np.zeros((width*rows,width*cols))
+    im_out = np.zeros((width*rows,width*cols))
     rand_indices = np.random.permutation(m)[0:rows*cols]
 
     counter = 0
@@ -40,9 +45,10 @@ def displayData(x,thetas=None):
         for c in range(0, cols):
             start_x = c * width
             start_y = r * width
-            out[start_x:start_x+width,start_y:start_y+width] = x_raw[rand_indices[counter]].reshape(width, width).T
+            im_out[start_x:start_x+width,start_y:start_y+width] = x_raw[rand_indices[counter]].reshape(width, width).T
             counter += 1
-    img = sp.misc.toimage(out)
+    #img = sp.misc.toimage(out)
+    img = Image.fromarray(im_out*255)
 
     # display image of digits
     figure = plt.figure()
@@ -57,7 +63,7 @@ def displayData(x,thetas=None):
             result = classifySample(theta1,theta2,x[idx])
             result_matrix.append(result)
         result_matrix = np.array(result_matrix).reshape(rows,cols).T
-        print result_matrix
+        print (result_matrix)
 
     plt.show( )
 
@@ -231,8 +237,8 @@ def findMinTheta(nn_params,x,y,num_iter):
     """
     thetas = np.copy(nn_params)
     result = sp.optimize.minimize(nnCostAndGradientFunction,x0=thetas,args=(x,y),method='L-BFGS-B',jac=True,options={'maxiter': num_iter}) 
-    print "success=", result.success
-    #print result
+    print ("success=", result.success)
+    #print (result)
     return result.x, result.fun
 
 def classifySample(theta1,theta2,samp):
@@ -256,7 +262,7 @@ def computeAccuracy(nn_params,x,y):
     for i in range(0,m):
         prediction = classifySample(theta1,theta2,x[i])
         actual =  np.argmax(y[i]) + 1 # Digit 1 is index 0
-        # print "prediction = %d actual = %d" % (prediction, actual)
+        # print ("prediction = ", prediction, " actual = ", actual)
         if actual == prediction:
             correct += 1
     accuracy = correct / float(m) * 100.0
@@ -295,13 +301,13 @@ def computeNumericalGradient(theta,samp,target):
 # Start main program    
 np.set_printoptions(precision=6, linewidth=200)
 
-print "test sigmoid gradient = ", sigmoidGradient(np.array([-5.0,-1.0,0,1.0,5.0]))
+print ("test sigmoid gradient = ", sigmoidGradient(np.array([-5.0,-1.0,0,1.0,5.0])))
 
 vals = sp.io.loadmat("./Data/ex4data1.mat")
 Xvals, Yvals = vals['X'], vals['y']
 m = len(Xvals)
 n = len(Xvals[0]) + 1
-print "number of samples = %d number of parameters = %d" % (m,n)
+print ("number of samples = ", m, " number of parameters = ", n)
 
 # Look at scaling the data versus not scaling
 if (1):
@@ -309,7 +315,7 @@ if (1):
     scales = np.ones((n-1,))
 else:
     scaledX, scales = normalizeVals(Xvals)
-#print "scales=", scales
+#print ("scales=", scales)
 
 # append bias = 1 to the sample vectors
 X = np.c_[np.ones((m,1)), scaledX]
@@ -326,26 +332,26 @@ input_nodes = len(GT_Theta1[0]) - 1 # theta matrix includes bias node
 output_nodes = len(GT_Theta2) 
 
 NN_Params = flattenParams(GT_Theta1,GT_Theta2)
-print "NN_Params dimensions = ", NN_Params.shape
+print ("NN_Params dimensions = ", NN_Params.shape)
 
 displayData(X,NN_Params)
 
 Theta1, Theta2 = unrollParams(NN_Params,input_nodes,hidden_nodes,output_nodes)
-print "Theta1 dimensions = ", Theta1.shape
-print "Theta2 dimensions = ", Theta2.shape
+print ("Theta1 dimensions = ", Theta1.shape)
+print ("Theta2 dimensions = ", Theta2.shape)
 
 predict, a2, a1, z2  = feedforward(Theta1,Theta2,X[SAMP])
-print "predict = ", predict
-print "Y=", Y[SAMP]
+print ("predict = ", predict)
+print ("Y=", Y[SAMP])
 
 cost = computeCost2(Theta1,Theta2,X[SAMP],Y[SAMP])
-print "cost = ", cost
+print ("cost = ", cost)
 
 total_cost = nnComputeCost(NN_Params,X,Y)
-print "total_cost = ", total_cost
+print ("total_cost = ", total_cost)
 
 GT_accuracy = computeAccuracy(NN_Params,X,Y)
-print "GT_accuracy: %.2f%%" % GT_accuracy
+print ("GT_accuracy: ", GT_accuracy)
 
 # learn neural network
 orig_theta1 = randInitializeWeights(input_nodes,hidden_nodes)
@@ -354,20 +360,20 @@ orig_params = flattenParams(orig_theta1,orig_theta2)
 
 # confirm that backpropagation math is correct
 if (0):
-    print "verifying backpropagation calculation ..."
+    print ("verifying backpropagation calculation ...")
     grad = computeGradient(orig_params,X[SAMP],Y[SAMP])
     ngrad = computeNumericalGradient(orig_params,X[SAMP],Y[SAMP])
     grad_err = np.sum((grad - ngrad)**2).mean()
-    print "grad_err = ", grad_err
+    print ("grad_err = ", grad_err)
 
 #cost, grad = nnCostAndGradientFunction(NN_Params,X,Y)
 
-print "training neural network ..."
+print ("training neural network ...")
 Thetas, cost = findMinTheta(orig_params,X,Y,iters)
-print "training complete"
-print "cost = ", cost
+print ("training complete")
+print ("cost = ", cost)
 
 accuracy = computeAccuracy(Thetas,X,Y)
-print "accuracy: %.2f%%" % accuracy
+print ("accuracy: ", accuracy)
 
 displayData(X,Thetas)

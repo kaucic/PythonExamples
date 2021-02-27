@@ -7,6 +7,7 @@ import sys
 '''For scientific computing'''
 from numpy import *
 import scipy.misc, scipy.io, scipy.optimize, scipy.cluster.vq
+import imageio
 
 '''For plotting'''
 from matplotlib import pyplot, cm, colors
@@ -100,11 +101,11 @@ def part1_1():
 	initial_centroids = array([[3, 3], [6, 2], [8, 5]])
 
 	idx = findClosestCentroids( X, initial_centroids )
-	print idx[0:3] # should be [1, 3, 2]
+	print (idx[0:3]) # should be [1, 3, 2]
 	
 	
 	centroids = computeCentroids( X, idx, K )
-	print centroids
+	print (centroids)
 	# should be 
 	# [[ 2.428301  3.157924]
 	#  [ 5.813503  2.633656]
@@ -130,43 +131,43 @@ def part1_3():
 
 	max_iters = 10
 	centroids = array([[3, 3], [6, 2], [8, 5]])
-	print kMeansInitCentroids( X, K ) # it's randomly one of the coordinates from X
+	print (kMeansInitCentroids( X, K ) ) # it's randomly one of the coordinates from X
 
 def part1_4():
-	A = scipy.misc.imread( "./Data/bird_small.png" )
-
-	# shows the image
-	axes 	= pyplot.gca()
-	figure 	= pyplot.gcf()
-	axes.imshow( A )
-	pyplot.show(  )
-
-	A = A / 255.0
-	img_size = shape( A )
-
-	X = A.reshape( img_size[0] * img_size[1], 3 )
-	K = 16
-	max_iters = 10
-
-	initial_centroids = kMeansInitCentroids( X, K )
-	centroids, idx = runkMeans( X, initial_centroids, max_iters )
+    A = imageio.imread( "./Data/bird_small.png" )	
+    #A = scipy.misc.imread( "./Data/bird_small.png" )
+  
+    # shows the image
+    axes 	= pyplot.gca()
+    figure 	= pyplot.gcf()
+    axes.imshow( A )
+    pyplot.show(  )
+    
+    A = A / 255.0
+    img_size = shape( A )
+    
+    X = A.reshape( img_size[0] * img_size[1], 3 )
+    K = 16
+    max_iters = 10
+    
+    initial_centroids = kMeansInitCentroids( X, K )
+    centroids, idx = runkMeans( X, initial_centroids, max_iters )
 
 	# mapping the centroids back to compressed image,
 	# e.g. all pixels in that cluster shares the same color as the centroid
-	m = shape( X )[0]
-	X_recovered = zeros( shape(X) )
-
-	for i in range( 0, m ):
-		k 				= int(idx[i]) - 1
-		X_recovered[i] 	= centroids[k]
-
-	X_recovered = X_recovered.reshape( img_size[0], img_size[1], 3 )
-	axes 	= pyplot.gca()
-	figure 	= pyplot.gcf()
-	axes.imshow( X_recovered )
-	pyplot.show(  )	
-
-
+    m = shape( X )[0]
+    X_recovered = zeros( shape(X) )
+    
+    for i in range( 0, m ):
+        k 				= int(idx[i]) - 1
+        X_recovered[i] 	= centroids[k]
+        
+    X_recovered = X_recovered.reshape( img_size[0], img_size[1], 3 )
+    axes 	= pyplot.gca()
+    figure 	= pyplot.gcf()
+    axes.imshow( X_recovered )
+    pyplot.show(  )	
+     
 def main():
 	set_printoptions(precision=6, linewidth=200)
 	part1_1()

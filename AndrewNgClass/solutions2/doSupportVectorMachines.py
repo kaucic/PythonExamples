@@ -5,10 +5,13 @@ Created on Wed Nov 11 11:43:54 2015
 @author: Robert Kaucic
 """
 
+import logging
+
 import numpy as np
 import scipy as sp
 from scipy import optimize,special
-from sklearn import svm, grid_search
+#from sklearn import svm, grid_search
+from sklearn import svm
 import matplotlib.pyplot as plt
 
 def readFile(fname):
@@ -107,7 +110,7 @@ Xraw, Yraw = vals['X'], vals['y']
 
 m = len(Xraw)
 n = len(Xraw[0])
-print "number of samples = %d number of parameters = %d" % (m,n)
+print ("number of samples = %d number of parameters = %d" % (m,n))
 
 # Look at scaling the data versus not scaling
 if (1):
@@ -116,7 +119,7 @@ if (1):
 else:
     scaledX, scales = normalizeVals(Xraw)
     
-print "scales=", scales
+print ("scales=", scales)
 
 # no need to append bias = 1 for SVM
 #X = np.c_[np.ones((m,1)), scaledX]
@@ -127,9 +130,9 @@ Y = Yraw.ravel()
 linear_svm = svm.SVC(C=1,kernel='linear',verbose=False)
 linear_svm.fit(X,Y)
 
-print "num support vecs =", linear_svm.n_support_
-print "coefs =", linear_svm.coef_
-print "intercept =", linear_svm.intercept_
+print ("num support vecs =", linear_svm.n_support_)
+print ("coefs =", linear_svm.coef_)
+print ("intercept =", linear_svm.intercept_)
 
 plotFit(linear_svm,X,Y)
 
@@ -142,14 +145,14 @@ x1 = np.array([1.0, 2.0, 1.0])
 x2 = np.array([0.0, 4.0, -1.0])
 sigma = 2.0
 
-print "Gaussian kernel: %f" % gaussianKernel(x1,x2,sigma)
+print ("Gaussian kernel: %f" % gaussianKernel(x1,x2,sigma))
 
 # load data set #2
 vals = sp.io.loadmat("./Data/ex6data2.mat")
 Xraw, Yraw = vals['X'], vals['y']
 
 scaledX, scales = normalizeVals(Xraw)
-print "scales=", scales
+print ("scales=", scales)
 
 X = scaledX
 Y = Yraw.ravel()
@@ -168,7 +171,7 @@ Xraw, Yraw = vals['X'], vals['y']
 Xv, Yv = vals['Xval'], vals['yval']
 
 scaledX, scales = normalizeVals(Xraw)
-print "scales=", scales
+print ("scales=", scales)
 
 X = scaledX
 Xval = Xv / scales
@@ -176,8 +179,8 @@ Y = Yraw.ravel()
 Yval = Yv.ravel()
 
 best, scores = findParameters(X,Y,Xval,Yval)
-print "scores=", scores
-print "best=", best
+print ("scores=", scores)
+print ("best=", best)
 rbf2_svm = svm.SVC(C=best['C'],kernel='rbf',gamma=best['gamma']) 
 rbf2_svm.fit(X,Y)
 

@@ -154,6 +154,7 @@ print "scales=", scales
 #print "scaledX=", scaledX
 
 # append bias = 1 to the sample vectors
+m = len()
 X = np.c_[np.ones((m,1)), scaledX]
 Y = vals[:,-1]
 
