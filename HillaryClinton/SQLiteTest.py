@@ -1,6 +1,6 @@
 #import sqlalchemy
 #from sqlalchemy import create_engine
-#engine = create_engine('mysql+://root:Cath0212@localhost:3306/test',echo=False);
+#engine = create_engine('mysql+',echo=False);
 #conn = engine.connect()
 #cur = engine.execute("SELECT * FROM Rating;")
 
