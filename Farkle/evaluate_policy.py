@@ -116,7 +116,7 @@ def find_next_action_conservative(state, reward, sigma):
             return (0, 100 * (state[1] - 7))
 
 
-global p1, p2, p3, R1, R2, R3
+global p1, p2, pnf3, R1, R2, R3
 
 pnf1 = 1./3
 p1 = 0.31739496
@@ -135,13 +135,18 @@ def compute_E2_total(R):
     return E
 
 pnf3 = 156./216
-#R3 = 83.56481
-#R3 = 92.72940957933241
-#p3 = 0.5006001371742113
-p3 = pnf3
 R3 = 83.56481
+
+R3 = 92.72940957933241
+pnf3 = 1 - 0.5006001371742113
+R3 = 91.23085276634657
+pnf3 = 1 - 0.477023319615912
+R3 = 200.0
+pnf3 = 0.1
+#R3 = 92.7258373342478
+#pnf3 = 1 - 0.49631344307270236
 def compute_E3_total(R):
-    return p3*R + R3
+    return pnf3*R + R3
 
 
 # plot the expected value function for i dice
@@ -342,7 +347,7 @@ def plot_reward_distribution(rewards,histogram):
     plt.show()
 
 # Start of main program
-histogram = navigate(None, 1, 0, policy = find_next_action_manual_best)
+histogram = navigate(3, 1, 0, policy = find_next_action_conservative)
 
 rewards = np.sort([key for key in histogram.keys()])
 print("Rewards: ", rewards)
@@ -352,7 +357,7 @@ for reward in histogram:
     E += reward * histogram[reward]
 print("Expected reward: ", E)
 
-#plot_reward_distribution(rewards,histogram)
+plot_reward_distribution(rewards,histogram)
 
 
 
