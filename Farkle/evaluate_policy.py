@@ -1,10 +1,10 @@
 # Probabilites for Farkleing with X Dice
 # 6 --  2.31%
 # 5 --  7.72%
-# 4 -- 15.74%
-# 3 -- 27.78%
-# 2 -- 44.44%
-# 1 -- 66.67%
+# 4 -- 15.74% -- 204/1296
+# 3 -- 27.78% --  60/216
+# 2 -- 44.44% --  16/36
+# 1 -- 66.67% --   4/6
 
 import numpy as np
 
@@ -116,38 +116,44 @@ def find_next_action_conservative(state, reward, sigma):
             return (0, 100 * (state[1] - 7))
 
 
-global p1, p2, pnf3, R1, R2, R3
+global p1, p2, p3, R1, R2, R3
 
 pnf1 = 1./3
 p1 = 0.31739496
 R1 = 35.24041445
+cross1 = 56.31
 def compute_E1_total(R):
-    E = 1./6*max(R+50,compute_E3_total(R+50)) + 1./6*max(R+100,compute_E3_total(R+100))
+    #E = 1./6*max(R+50,compute_E3_total(R+50)) + 1./6*max(R+100,compute_E3_total(R+100))
+    E = p1*R + R1
     return E
 
 pnf2 = 5./9
-p2 = 0.55218238
-R2 = 52.12393241
+p2 = 0.54878706
+R2 = 52.91624684
+cross2 = 117.58
 def compute_E2_total(R):
-    E = ( 2./9*max(R+50,compute_E1_total(R+50)) + 2./9*max(R+100,compute_E1_total(R+100)) +
-    1./36*max(R+100,compute_E3_total(R+100)) +  1./18*max(R+150,compute_E3_total(R+150)) +
-    1./36*max(R+200,compute_E3_total(R+200)) )
+    #E = ( 2./9*max(R+50,compute_E1_total(R+50)) + 2./9*max(R+100,compute_E1_total(R+100)) +
+    #1./36*max(R+100,compute_E3_total(R+100)) +  1./18*max(R+150,compute_E3_total(R+150)) +
+    #1./36*max(R+200,compute_E3_total(R+200)) )
+    E = p2*R + R2
     return E
 
 pnf3 = 156./216
-R3 = 83.56481
-
-R3 = 92.72940957933241
-pnf3 = 1 - 0.5006001371742113
-R3 = 91.23085276634657
-pnf3 = 1 - 0.477023319615912
-R3 = 200.0
-pnf3 = 0.1
-#R3 = 92.7258373342478
-#pnf3 = 1 - 0.49631344307270236
+p3 = 0.71516241
+R3 = 86.53020591
+cross3 = 303.84
 def compute_E3_total(R):
-    return pnf3*R + R3
+    #E = ( 2./9*max(R+50,compute_E2_total(R+50)) + 2./9*max(R+100,compute_E2_total(R+100)) +
+    #1./18* max([R+100,compute_E1_total(R+100),compute_E2_total(R+50)])  + 1./9*max([R+150,compute_E1_total(R+150),compute_E2_total(R+100)]) +
+    #1./18* max([R+200,compute_E1_total(R+200),compute_E2_total(R+100)]) + 1./216*max(R+200,approximate_E3_total(R+200)) +
+    #1./72* max([R+200,compute_E1_total(R+150),compute_E2_total(R+100),approximate_E3_total(R+200)]) +
+    #1./72* max([R+250,compute_E1_total(R+200),compute_E2_total(R+100),approximate_E3_total(R+250)]) +
+    #1./216*max([R+300,compute_E1_total(R+200),compute_E2_total(R+100),approximate_E3_total(R+300)]) +
+    #1./216*max(R+300,approximate_E3_total(R+300)) + 1./216*max(R+400,approximate_E3_total(R+400)) +
+    #1./216*max(R+500,approximate_E3_total(R+500)) + 1./216*max(R+600,approximate_E3_total(R+600)) )
 
+    E = p3*R + R3
+    return E
 
 # plot the expected value function for i dice
 def plot_expected_value_function(i):
@@ -166,8 +172,10 @@ def plot_expected_value_function(i):
     y = np.array(E)
     A = np.c_[np.ones((m,1)), rewards]
     coeffs = np.dot(np.linalg.pinv(A), y)
-    print (coeffs)
-    
+    print (f"linear coefficients for {i} dice are {coeffs}")
+    crossover = coeffs[0] / (1 - coeffs[1])
+    print (f"crossover point is {crossover}")
+
     text = "Expected Value function for %d dice" % i
     plt.figure(text, figsize=(13, 8))
     plt.yscale("linear")
@@ -182,8 +190,8 @@ def plot_expected_value_function(i):
     return rewards,E 
 
 
-# One final throw if after the first throw the reward is 50,
-# or if three dice are available to throw and the reward is not greater than 300
+# if three dice are available to throw and the reward is <= 300 or 
+# after the first throw the reward <= 50
 def find_next_action_manual_best(state, reward, sigma):
     
     if state[0] == 1:
@@ -302,7 +310,7 @@ def find_next_action_manual_best(state, reward, sigma):
             return (0, 600)
     
 # Navigate outcomes
-def navigate(i, probability, reward, sigma = (), histogram = None, policy = find_next_action_min_greedy):
+def navigate(i, probability, reward, sigma = (), histogram = None, policy = find_next_action_conservative):
     if histogram == None:
         histogram = dict()
     outcomes = throw(i)
@@ -347,7 +355,7 @@ def plot_reward_distribution(rewards,histogram):
     plt.show()
 
 # Start of main program
-histogram = navigate(3, 1, 0, policy = find_next_action_conservative)
+histogram = navigate(3, 1, 0, policy =  find_next_action_manual_best)
 
 rewards = np.sort([key for key in histogram.keys()])
 print("Rewards: ", rewards)
