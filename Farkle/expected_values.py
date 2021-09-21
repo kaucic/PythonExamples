@@ -57,7 +57,7 @@ def compute_E33_total(R):
 
 pnf4 = 1092./1296
 ap44 = pnf4
-aR44 = 200
+aR44 = 160
 def approximate_E44_total(R):
     E = ap44*R + aR44
     return E
@@ -101,10 +101,10 @@ pnf4 = 1092./1296
 p44 = 0
 R44 = 0
 def compute_E44_total(R):
-    E = ( 256./1296*max(R+50,compute_E34_total(R+50)) + 256./1296*max(R+100,compute_E34_total(R+100)) +
-    112./1296*max([R+100,compute_E24_total(R+100),compute_E34_total(R+50)]) +
+    E = ( 240./1296*max(R+50,compute_E34_total(R+50)) + 240./1296*max(R+100,compute_E34_total(R+100)) +
+    96./1296* max([R+100,compute_E24_total(R+100),compute_E34_total(R+50)]) +
     192./1296*max([R+150,compute_E24_total(R+150),compute_E34_total(R+100)]) +
-    112./1296*max([R+200,compute_E24_total(R+200),compute_E34_total(R+100)]) +
+    96./1296*max([R+200,compute_E24_total(R+200),compute_E34_total(R+100)]) +
     48./1296* max([R+200,compute_E14_total(R+200),compute_E24_total(R+150),compute_E34_total(R+100)]) +
     12./1296* max(R+200,compute_E14_total(R+200)) +
     48./1296* max([R+250,compute_E14_total(R+250),compute_E24_total(R+200),compute_E34_total(R+100)]) +
@@ -180,26 +180,27 @@ def plot_expected_value_function(i,N,rewards):
 
 # Start main program
 if __name__ == "__main__":
-    rewards = list( range(0,301,25) )    
-    reward,E = plot_expected_value_function(1,3,rewards)
+    if False:
+        rewards = list( range(0,301,25) )    
+        reward,E = plot_expected_value_function(1,3,rewards)
 
-    rewards = list( range(0,401,50) ) 
-    reward,E = plot_expected_value_function(2,3,rewards)
+        rewards = list( range(0,401,50) ) 
+        reward,E = plot_expected_value_function(2,3,rewards)
 
-    rewards = list( range(0,601,50) ) 
-    reward,E = plot_expected_value_function(3,3,rewards)
+        rewards = list( range(0,601,50) ) 
+        reward,E = plot_expected_value_function(3,3,rewards)
+    else:
+        rewards = list( range(0,401,25) ) 
+        reward,E = plot_expected_value_function(1,4,rewards)
 
-    rewards = list( range(0,401,25) ) 
-    reward,E = plot_expected_value_function(1,4,rewards)
+        rewards = list( range(0,601,50) ) 
+        reward,E = plot_expected_value_function(2,4,rewards)
 
-    rewards = list( range(0,601,50) ) 
-    reward,E = plot_expected_value_function(2,4,rewards)
+        rewards = list( range(0,1001,50) ) 
+        reward,E = plot_expected_value_function(3,4,rewards)
 
-    rewards = list( range(0,801,50) ) 
-    reward,E = plot_expected_value_function(3,4,rewards)
-
-    rewards = list( range(0,2001,50) ) 
-    reward,E = plot_expected_value_function(4,4,rewards)
+        rewards = list( range(0,2001,50) ) 
+        reward,E = plot_expected_value_function(4,4,rewards)
 
 
     
