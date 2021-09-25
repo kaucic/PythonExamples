@@ -187,6 +187,84 @@ def compute_E33_total(R):
     E = p33*R + R33  
     return E
 
+def compute_E1_total_recursive(R, counter=0, max_counter=3):
+    if counter > max_counter:
+        return -1
+
+    E = 1 / 6 * max(R +  50, compute_E3_total_recursive(R +  50, counter + 1, max_counter)) + \
+        1 / 6 * max(R + 100, compute_E3_total_recursive(R + 100, counter + 1, max_counter))
+    
+    return E
+
+def compute_E2_total_recursive(R, counter=0, max_counter=3):
+    if counter > max_counter:
+        return -1
+
+    E = 2 /  9 * max(R +  50, compute_E1_total_recursive(R +  50, counter + 1, max_counter)) + \
+        2 /  9 * max(R + 100, compute_E1_total_recursive(R + 100, counter + 1, max_counter)) + \
+        1 / 36 * max(R + 100, compute_E3_total_recursive(R + 100, counter + 1, max_counter)) + \
+        1 / 18 * max(R + 150, compute_E3_total_recursive(R + 150, counter + 1, max_counter)) + \
+        1 / 36 * max(R + 200, compute_E3_total_recursive(R + 200, counter + 1, max_counter))
+    
+    return E
+
+def compute_E3_total_recursive(R, counter=0, max_counter=3):
+    if counter > max_counter:
+        return -1
+
+    E = 48 / 216 * max(R +  50, compute_E2_total_recursive(R +  50, counter + 1, max_counter)) + \
+        48 / 216 * max(R + 100, compute_E2_total_recursive(R + 100, counter + 1, max_counter)) + \
+        12 / 216 * max(R + 100, compute_E1_total_recursive(R + 100, counter + 1, max_counter), compute_E2_total_recursive(R +  50, counter + 1, max_counter)) + \
+        24 / 216 * max(R + 150, compute_E1_total_recursive(R + 150, counter + 1, max_counter), compute_E2_total_recursive(R + 100, counter + 1, max_counter)) + \
+        12 / 216 * max(R + 200, compute_E1_total_recursive(R + 200, counter + 1, max_counter), compute_E2_total_recursive(R + 100, counter + 1, max_counter)) + \
+         1 / 216 * (
+            max(R + 200, compute_E3_total_recursive(R + 200, counter + 1, max_counter)) + \
+            max(R + 300, compute_E3_total_recursive(R + 300, counter + 1, max_counter)) + \
+            max(R + 300, compute_E3_total_recursive(R + 300, counter + 1, max_counter)) + \
+            max(R + 400, compute_E3_total_recursive(R + 400, counter + 1, max_counter)) + \
+            max(R + 500, compute_E3_total_recursive(R + 500, counter + 1, max_counter)) + \
+            max(R + 600, compute_E3_total_recursive(R + 600, counter + 1, max_counter))
+         ) + \
+         3 / 216 * (
+            max(R + 200, compute_E3_total_recursive(R + 200, counter + 1, max_counter)) + \
+            max(R + 250, compute_E3_total_recursive(R + 250, counter + 1, max_counter))
+         )
+
+    return E
+
+def polt_recursive_function(i):
+    rewards = list( range(0,901,50) )
+    if i == 1:
+        E = [compute_E1_total_recursive(r) for r in rewards]
+             
+    elif i == 2:
+        E = [compute_E2_total_recursive(r) for r in rewards]
+    
+    else:
+        E = [compute_E3_total_recursive(r) for r in rewards]
+        
+    # Use least squares to solve for reward function linear coefficients
+    m = len(rewards)
+    y = np.array(E)
+    A = np.c_[np.ones((m,1)), rewards]
+    coeffs = np.dot(np.linalg.pinv(A), y)
+    print (f"linear coefficients for {i} dice are {coeffs}")
+    crossover = coeffs[0] / (1 - coeffs[1])
+    print (f"crossover point is {crossover}")
+
+    text = "Expected Value function for %d dice" % i
+    plt.figure(text, figsize=(13, 8))
+    plt.yscale("linear")
+    plt.title(text)
+    plt.xlabel("$R$")
+    plt.xticks(rewards)
+    plt.ylabel("Expected Value")
+    plt.plot(rewards, E)
+    plt.plot(rewards, rewards)
+    plt.show()
+
+    return rewards,E 
+
 # plot the expected value function for i dice
 def plot_expected_value_function(i):
     rewards = list( range(0,901,50) )
@@ -410,3 +488,6 @@ for reward in histogram:
 print("Expected reward: ", E)
 
 plot_reward_distribution(rewards,histogram)
+
+for i in range(1, 4):
+    polt_recursive_function(i)
