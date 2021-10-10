@@ -6,6 +6,7 @@
 # 2 -- 44.44% --   16/36
 # 1 -- 66.67% --    4/6
 
+import expected_values
 import numpy as np
 
 import matplotlib
@@ -145,224 +146,69 @@ def find_next_action_conservative(state, reward, sigma):
         else:
             return (0, 100 * (state[1] - 7))
 
-def compute_E13_total(R):
-    pnf1 = 1./3
-    p13 = 0.25753799
-    R13 = 44.53050607
-    cross13 = 59.97
-
-    #E = 1./6*max(R+50,approximate_E33_total(R+50)) + 1./6*max(R+100,approximate_E33_total(R+100))
-    E = p13*R + R13       
-    return E
-
-def compute_E23_total(R):
-    pnf2 = 5./9
-    p23 = 0.54270048
-    R23 = 53.85035555 
-    cross23 = 117.58
-
-    #E = ( 8./36*max(R+50,compute_E13_total(R+50)) + 8./36*max(R+100,compute_E13_total(R+100)) +
-    #1./36* max([R+100,compute_E14_total(R+50),approximate_E33_total(R+100)]) +
-    #2./36* max([R+150,compute_E14_total(R+100),approximate_E33_total(R+150)]) +
-    #1./36* max([R+200,compute_E14_total(R+100),approximate_E33_total(R+200)]) )   
-    E = p23*R + R23   
-    return E
-
-def compute_E33_total(R):
-    pnf3 = 156./216
-    p33 = 0.72222222
-    R33 = 83.56481481 
-    cross33 = 300.83
-
-    #E = ( 48./216*max(R+50,compute_E23_total(R+50)) + 48./216*max(R+100,compute_E23_total(R+100)) +
-    #12./216* max([R+100,compute_E13_total(R+100),compute_E23_total(R+50)])  +
-    #24./216* max([R+150,compute_E13_total(R+150),compute_E23_total(R+100)]) +
-    #12./216* max([R+200,compute_E13_total(R+200),compute_E23_total(R+100)]) +
-    #1./216*  max(R+200,approximate_E33_total(R+200)) +
-    #3./216*  max([R+200,compute_E13_total(R+150),compute_E23_total(R+100),approximate_E33_total(R+200)]) +
-    #3./216*  max([R+250,compute_E13_total(R+200),compute_E23_total(R+100),approximate_E33_total(R+250)]) +
-    #1./216*  max([R+300,compute_E13_total(R+200),compute_E23_total(R+100),approximate_E33_total(R+300)]) +
-    #1./216*  max(R+300,approximate_E33_total(R+300)) + 1./216*max(R+400,approximate_E33_total(R+400)) +
-    #1./216*  max(R+500,approximate_E33_total(R+500)) + 1./216*max(R+600,approximate_E33_total(R+600)) )
-    E = p33*R + R33  
-    return E
-
-def compute_E1_total_recursive(R, counter=0, max_counter=3):
-    if counter > max_counter:
-        return -1
-
-    E = 1 / 6 * max(R +  50, compute_E3_total_recursive(R +  50, counter + 1, max_counter)) + \
-        1 / 6 * max(R + 100, compute_E3_total_recursive(R + 100, counter + 1, max_counter))
-    
-    return E
-
-def compute_E2_total_recursive(R, counter=0, max_counter=3):
-    if counter > max_counter:
-        return -1
-
-    E = 2 /  9 * max(R +  50, compute_E1_total_recursive(R +  50, counter + 1, max_counter)) + \
-        2 /  9 * max(R + 100, compute_E1_total_recursive(R + 100, counter + 1, max_counter)) + \
-        1 / 36 * max(R + 100, compute_E3_total_recursive(R + 100, counter + 1, max_counter)) + \
-        1 / 18 * max(R + 150, compute_E3_total_recursive(R + 150, counter + 1, max_counter)) + \
-        1 / 36 * max(R + 200, compute_E3_total_recursive(R + 200, counter + 1, max_counter))
-    
-    return E
-
-def compute_E3_total_recursive(R, counter=0, max_counter=3):
-    if counter > max_counter:
-        return -1
-
-    E = 48 / 216 * max(R +  50, compute_E2_total_recursive(R +  50, counter + 1, max_counter)) + \
-        48 / 216 * max(R + 100, compute_E2_total_recursive(R + 100, counter + 1, max_counter)) + \
-        12 / 216 * max(R + 100, compute_E1_total_recursive(R + 100, counter + 1, max_counter), compute_E2_total_recursive(R +  50, counter + 1, max_counter)) + \
-        24 / 216 * max(R + 150, compute_E1_total_recursive(R + 150, counter + 1, max_counter), compute_E2_total_recursive(R + 100, counter + 1, max_counter)) + \
-        12 / 216 * max(R + 200, compute_E1_total_recursive(R + 200, counter + 1, max_counter), compute_E2_total_recursive(R + 100, counter + 1, max_counter)) + \
-         1 / 216 * (
-            max(R + 200, compute_E3_total_recursive(R + 200, counter + 1, max_counter)) + \
-            max(R + 300, compute_E3_total_recursive(R + 300, counter + 1, max_counter)) + \
-            max(R + 300, compute_E3_total_recursive(R + 300, counter + 1, max_counter)) + \
-            max(R + 400, compute_E3_total_recursive(R + 400, counter + 1, max_counter)) + \
-            max(R + 500, compute_E3_total_recursive(R + 500, counter + 1, max_counter)) + \
-            max(R + 600, compute_E3_total_recursive(R + 600, counter + 1, max_counter))
-         ) + \
-         3 / 216 * (
-            max(R + 200, compute_E3_total_recursive(R + 200, counter + 1, max_counter)) + \
-            max(R + 250, compute_E3_total_recursive(R + 250, counter + 1, max_counter))
-         )
-
-    return E
-
-def polt_recursive_function(i):
-    rewards = list( range(0,901,50) )
-    if i == 1:
-        E = [compute_E1_total_recursive(r) for r in rewards]
-             
-    elif i == 2:
-        E = [compute_E2_total_recursive(r) for r in rewards]
-    
-    else:
-        E = [compute_E3_total_recursive(r) for r in rewards]
-        
-    # Use least squares to solve for reward function linear coefficients
-    m = len(rewards)
-    y = np.array(E)
-    A = np.c_[np.ones((m,1)), rewards]
-    coeffs = np.dot(np.linalg.pinv(A), y)
-    print (f"linear coefficients for {i} dice are {coeffs}")
-    crossover = coeffs[0] / (1 - coeffs[1])
-    print (f"crossover point is {crossover}")
-
-    text = "Expected Value function for %d dice" % i
-    plt.figure(text, figsize=(13, 8))
-    plt.yscale("linear")
-    plt.title(text)
-    plt.xlabel("$R$")
-    plt.xticks(rewards)
-    plt.ylabel("Expected Value")
-    plt.plot(rewards, E)
-    plt.plot(rewards, rewards)
-    plt.show()
-
-    return rewards,E 
-
-# plot the expected value function for i dice
-def plot_expected_value_function(i):
-    rewards = list( range(0,901,50) )
-    if i == 1:
-        E = [compute_E13_total(r) for r in rewards]
-             
-    elif i == 2:
-        E = [compute_E23_total(r) for r in rewards]
-    
-    else:
-        E = [compute_E33_total(r) for r in rewards]
-        
-    # Use least squares to solve for reward function linear coefficients
-    m = len(rewards)
-    y = np.array(E)
-    A = np.c_[np.ones((m,1)), rewards]
-    coeffs = np.dot(np.linalg.pinv(A), y)
-    print (f"linear coefficients for {i} dice are {coeffs}")
-    crossover = coeffs[0] / (1 - coeffs[1])
-    print (f"crossover point is {crossover}")
-
-    text = "Expected Value function for %d dice" % i
-    plt.figure(text, figsize=(13, 8))
-    plt.yscale("linear")
-    plt.title(text)
-    plt.xlabel("$R$")
-    plt.xticks(rewards)
-    plt.ylabel("Expected Value")
-    plt.plot(rewards, E)
-    plt.plot(rewards, rewards)
-    plt.show()
-
-    return rewards,E 
-
-
 # if three dice are available to throw and the reward is <= 300 or 
 # after the first throw the reward <= 50
 def find_next_action_manual_best(state, reward, sigma):
     
     if state[0] == 1:
         if state[1] == 1:
-            if reward + 50 <= compute_E33_total(reward + 50):
+            if reward + 50 <= expected_values.compute_E33_total(reward + 50):
                 return (3, 50)
             else:
                 return (0, 50)
         if state[1] == 2:
-            if reward + 100 <= compute_E33_total(reward + 100):
+            if reward + 100 <= expected_values.compute_E33_total(reward + 100):
                 return (3, 100)
             else:
                 return (0, 100)
         
     elif state[0] == 2:
         if state[1] == 1:
-            if reward + 50 <= compute_E13_total(reward + 50):
+            if reward + 50 <= expected_values.compute_E13_total(reward + 50):
                 return (1, 50)
             else:
                 return (0, 50)
 
         if state[1] == 2:
-            if reward + 100 <= compute_E13_total(reward + 100):
+            if reward + 100 <= expected_values.compute_E13_total(reward + 100):
                 return (1, 100)
             else:
                 return (0, 100)
 
         if state[1] == 3:
-            if reward + 100 <= compute_E33_total(reward + 100):
+            if reward + 100 <= expected_values.compute_E33_total(reward + 100):
                 return (3, 100)
             else:
                 return (0, 100)
 
         if state[1] == 4:
-            if reward + 150 <= compute_E33_total(reward + 150):
+            if reward + 150 <= expected_values.compute_E33_total(reward + 150):
                 return (3, 150)
             else:
                 return (0, 150)
 
         if state[1] == 5:
-            if reward + 200 <= compute_E33_total(reward + 200):
+            if reward + 200 <= expected_values.compute_E33_total(reward + 200):
                 return (3, 200)
             else:
                 return (0, 200)
     
     else: # state[0] == 3 dice
         if state[1] == 1:
-            if reward + 50 <= compute_E23_total(reward + 50):
+            if reward + 50 <= expected_values.compute_E23_total(reward + 50):
                 return (2, 50)
             else:
                 return (0, 50)
 
         elif state[1] == 2:
-            if reward + 100 <= compute_E23_total(reward + 100):
+            if reward + 100 <= expected_values.compute_E23_total(reward + 100):
                 return (2, 100)
             else:
                 return (0, 100)
 
         elif state[1] == 3:
-            E2 = compute_E23_total(reward + 50)
-            E1 = compute_E13_total(reward + 100)
+            E2 = expected_values.compute_E23_total(reward + 50)
+            E1 = expected_values.compute_E13_total(reward + 100)
             if E2 > E1:
                 if reward + 100 <= E2:
                     return (2, 50)
@@ -378,55 +224,55 @@ def find_next_action_manual_best(state, reward, sigma):
             return (0, 150)
 
         elif state[1] == 5:
-            if reward + 200 <= compute_E13_total(reward + 200):
+            if reward + 200 <= expected_values.compute_E13_total(reward + 200):
                 return (1, 200)
             else:
                 return (0, 200)
 
         elif state[1] == 6:
-            if reward + 200 <= compute_E33_total(reward + 200):
+            if reward + 200 <= expected_values.compute_E33_total(reward + 200):
                 return (3, 200)
             else:
                 return (0, 200)
 
         elif state[1] == 7:
-            if reward + 200 <= compute_E33_total(reward + 200):
+            if reward + 200 <= expected_values.compute_E33_total(reward + 200):
                 return (3, 200)
             else:
                 return (0, 200)    
 
         elif state[1] == 8:
-            if reward + 250 <= compute_E33_total(reward + 250):
+            if reward + 250 <= expected_values.compute_E33_total(reward + 250):
                 return (3, 250)
             else:
                 return (0, 250)
 
         elif state[1] == 9:
-            if reward + 300 <= compute_E33_total(reward + 300):
+            if reward + 300 <= expected_values.compute_E33_total(reward + 300):
                 return (3, 300)
             else:
                 return (0, 300)    
 
         elif state[1] == 10:
-            if reward + 300 <= compute_E33_total(reward + 300):
+            if reward + 300 <= expected_values.compute_E33_total(reward + 300):
                 return (3, 300)
             else:
                 return (0, 300)
 
         elif state[1] == 11:
-            if reward + 400 <= compute_E33_total(reward + 400):
+            if reward + 400 <= expected_values.compute_E33_total(reward + 400):
                 return (3, 400)
             else:
                 return (0, 400)
 
         elif state[1] == 12:
-            if reward + 500 <= compute_E33_total(reward + 500):
+            if reward + 500 <= expected_values.compute_E33_total(reward + 500):
                 return (3, 500)
             else:
                 return (0, 500)
 
         else: # state[1] == 13
-            if reward + 600 <= compute_E33_total(reward + 600):
+            if reward + 600 <= expected_values.compute_E33_total(reward + 600):
                 return (3, 600)
             else:
                 return (0, 600)
@@ -460,10 +306,10 @@ def navigate(i, probability, reward, sigma = (), histogram = None, policy = find
     
     return histogram
 
-def plot_reward_distribution(rewards,histogram):
+def plot_reward_distribution(rewards, histogram):
     text = "Log of Reward Distribution for ""Conservative Plus"" Policy"
     plt.figure(text, figsize=(13, 8))
-    plt.bar(histogram.keys(), histogram.values(), width = 40, label = "$log(P)$")
+    plt.bar(histogram.keys(), histogram.values(), width=40, label="$log(P)$")
     plt.yscale("log")
     plt.title(text)
     plt.xlabel("$R$")
@@ -471,23 +317,21 @@ def plot_reward_distribution(rewards,histogram):
     plt.ylim((1e-5, 1))
     plt.ylabel("$\log(P(R))$")
     plt.grid("on")
-    plt.plot(E, plt.ylim()[0], "r*", clip_on = False, label = "$E[R] = %2.2f$" % E)
+    plt.plot(E, plt.ylim()[0], "r*", clip_on=False, label="$E[R] = %2.2f$" % E)
     plt.legend()
     plt.savefig(text + (".%s" % "pdf"), bbox_inches='tight')
     plt.show()
 
 # Start of main program
-histogram = navigate(3, 1, 0, policy =  find_next_action_manual_best)
+if __name__ == "__main__":
+    histogram = navigate(3, 1, 0, policy=find_next_action_manual_best)
 
-rewards = np.sort([key for key in histogram.keys()])
-print("Rewards: ", rewards)
-print("Probability of Farkle: ", histogram[0])
-E = 0
-for reward in histogram:
-    E += reward * histogram[reward]
-print("Expected reward: ", E)
+    rewards = np.sort([key for key in histogram.keys()])
+    print("Rewards: ", rewards)
+    print("Probability of Farkle: ", histogram[0])
+    E = 0
+    for reward in histogram:
+        E += reward * histogram[reward]
+    print("Expected reward: ", E)
 
-plot_reward_distribution(rewards,histogram)
-
-for i in range(1, 4):
-    polt_recursive_function(i)
+    plot_reward_distribution(rewards,histogram)
