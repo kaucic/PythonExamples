@@ -330,14 +330,14 @@ def plot_expected_value_function(i, N, method, rewards):
 if __name__ == "__main__":
     if True:
         for method in ["approx", "recurse"]:
-                rewards = list(range(0, 301, 25))
-                reward, E = plot_expected_value_function(1, 3, method, rewards)
+            rewards = list(range(0, 301, 25))
+            reward, E = plot_expected_value_function(1, 3, method, rewards)
 
-                rewards = list(range(0, 401, 50))
-                reward, E = plot_expected_value_function(2, 3, method, rewards)
+            rewards = list(range(0, 401, 50))
+            reward, E = plot_expected_value_function(2, 3, method, rewards)
 
-                rewards = list(range(150, 601, 50))
-                reward, E = plot_expected_value_function(3, 3, method, rewards)
+            rewards = list(range(150, 601, 50))
+            reward, E = plot_expected_value_function(3, 3, method, rewards)
 
     else:
         rewards = list(range(0, 401, 25))
