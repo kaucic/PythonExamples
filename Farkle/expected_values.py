@@ -252,7 +252,7 @@ def throw(i = None):
 
 # Start main program
 if __name__ == "__main__":
-    if True:
+    if False:
         rewards = list( range(0,301,25) )    
         reward,E = plot_expected_value_function(1,3,rewards)
 
