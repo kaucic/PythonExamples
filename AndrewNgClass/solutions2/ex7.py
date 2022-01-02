@@ -120,9 +120,8 @@ def part1_2():
 	max_iters = 10
 	centroids = array([[3, 3], [6, 2], [8, 5]])
 	
-	runkMeans( X, centroids, max_iters, plot=True )
-
-
+	new_centroids,new_idx = runkMeans( X, centroids, max_iters, plot=True )
+	print (new_centroids)
 
 def part1_3():
 	mat = scipy.io.loadmat( "./Data/ex7data2.mat" )
@@ -132,6 +131,8 @@ def part1_3():
 	max_iters = 10
 	centroids = array([[3, 3], [6, 2], [8, 5]])
 	print (kMeansInitCentroids( X, K ) ) # it's randomly one of the coordinates from X
+	new_centroids,new_idx = runkMeans( X, centroids, max_iters, plot=False )
+	print (new_centroids)
 
 def part1_4():
     A = imageio.imread( "./Data/bird_small.png" )	
@@ -170,9 +171,9 @@ def part1_4():
      
 def main():
 	set_printoptions(precision=6, linewidth=200)
-	part1_1()
-	part1_2()
-	part1_3()
+	#part1_1()
+	#part1_2()
+	#part1_3()
 	part1_4()
 	
 
