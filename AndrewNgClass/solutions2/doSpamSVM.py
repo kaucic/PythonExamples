@@ -52,6 +52,7 @@ def normalizeVals(x):
     Scale values by subtracting the mean and dividing by half the range 
     to get data in the range [-1,1]    
     Save mean and scale factors for reuse in testing data
+    Instead of that, just divide by the max magnitude to ensure that values in all dimensions are between [-1,1]
     With simple scaling, RNN weights should be able to undo scaling
     """
     maxvals = x.max(axis=0).astype(float)

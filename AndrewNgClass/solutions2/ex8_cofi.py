@@ -13,12 +13,14 @@ from mpl_toolkits.mplot3d import Axes3D
 def loadMovieList():
 	movies = {}
 	counter = 0
-	with open('/Users/saburookita/Downloads/mlclass-ex8-004/mlclass-ex8/movie_ids.txt', 'rb') as f:
+	#with open('/Users/saburookita/Downloads/mlclass-ex8-004/mlclass-ex8/movie_ids.txt', 'rb') as f:
+	with open('Data/movie_ids.txt', 'r') as f:
 		contents = f.readlines()
 		for content in contents:
 			movies[counter] = content.strip().split(' ', 1)[1]
 			counter += 1
 
+	print ("found %d movies in movie_ids.txt" % counter)
 	return movies
 
 def normalizeRatings( Y, R ):
@@ -55,10 +57,11 @@ def cofiCostFunc( params, Y, R, num_users, num_movies, num_features, lamda ):
 	return J + regularization
 
 def part2_1():
-	mat = scipy.io.loadmat('/Users/saburookita/Downloads/mlclass-ex8-004/mlclass-ex8/ex8_movies.mat')
+	#mat = scipy.io.loadmat('/Users/saburookita/Downloads/mlclass-ex8-004/mlclass-ex8/ex8_movies.mat')
+	mat = scipy.io.loadmat('Data/ex8_movies.mat')
 	Y, R = mat['Y'], mat['R']
 
-	print mean( extract ( Y[0,:] * R[0,:] > 0, Y[0, :] ) )
+	print (mean( extract ( Y[0,:] * R[0,:] > 0, Y[0, :] ) ) ) 
 
 	pyplot.imshow( Y )
 	pyplot.ylabel( 'Movies' )
@@ -66,10 +69,12 @@ def part2_1():
 	pyplot.show()
 
 def part2_2():
-	mat = scipy.io.loadmat('/Users/saburookita/Downloads/mlclass-ex8-004/mlclass-ex8/ex8_movies.mat')
+	#mat = scipy.io.loadmat('/Users/saburookita/Downloads/mlclass-ex8-004/mlclass-ex8/ex8_movies.mat')
+	mat = scipy.io.loadmat('Data/ex8_movies.mat')
 	Y, R = mat['Y'], mat['R']
 
-	mat = scipy.io.loadmat('/Users/saburookita/Downloads/mlclass-ex8-004/mlclass-ex8/ex8_movieParams.mat')
+	#mat = scipy.io.loadmat('/Users/saburookita/Downloads/mlclass-ex8-004/mlclass-ex8/ex8_movieParams.mat')
+	mat = scipy.io.loadmat('Data/ex8_movieParams.mat')
 	num_features = mat['num_features']
 	num_users 	 = mat['num_users']
 	num_movies 	 = mat['num_movies']
@@ -87,10 +92,10 @@ def part2_2():
 
 
 	params = r_[X.T.flatten(), theta.T.flatten()]
-	print cofiCostFunc( params, Y, R, num_users, num_movies, num_features, 0 )
-	print cofiGradFunc( params, Y, R, num_users, num_movies, num_features, 0 )
-	print cofiCostFunc( params, Y, R, num_users, num_movies, num_features, 1.5 )
-	print cofiGradFunc( params, Y, R, num_users, num_movies, num_features, 1.5 )
+	print (cofiCostFunc( params, Y, R, num_users, num_movies, num_features, 0 ) )
+	print (cofiGradFunc( params, Y, R, num_users, num_movies, num_features, 0 ) )
+	print (cofiCostFunc( params, Y, R, num_users, num_movies, num_features, 1.5 ) )
+	print (cofiGradFunc( params, Y, R, num_users, num_movies, num_features, 1.5 ) )
 
 
 def part2_3():
@@ -113,7 +118,8 @@ def part2_3():
 	# 	if my_ratings[i] > 0:
 	# 		print "Rated %d for %s" % (my_ratings[i], movies[i])
 
-	mat = scipy.io.loadmat('/Users/saburookita/Downloads/mlclass-ex8-004/mlclass-ex8/ex8_movies.mat')
+	#mat = scipy.io.loadmat('/Users/saburookita/Downloads/mlclass-ex8-004/mlclass-ex8/ex8_movies.mat')
+	mat = scipy.io.loadmat('Data/ex8_movies.mat')
 	Y, R = mat['Y'], mat['R']
 
 	Y = c_[my_ratings, Y]
@@ -147,15 +153,15 @@ def part2_3():
 	my_prediction = my_prediction[idx]
 
 
-	for i in range(0, 10):
+	for i in range(0, 20):
 		j = idx[i, 0]
-		print "Predicting rating %.1f for movie %s" % (my_prediction[j], movies[j])
+		print ("Predicting rating %.1f for movie %d named %s" % (my_prediction[j], j, movies[j]))
 
 
 
 def main():
-	# part2_1()
-	# part2_2()
+	part2_1()
+	part2_2()
 	part2_3()
 
 
