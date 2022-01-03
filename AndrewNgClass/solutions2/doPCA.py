@@ -17,40 +17,16 @@ from PIL import Image
 from matplotlib import pyplot, cm, colors, lines
 #import matplotlib.pyplot as plt
 
+from AndrewNgUtils import Utils
+
 class PCA:
     def __init__(self):
-        return 
-        
-    def loadMatlabData(self,fname) -> np.array:
-        mat = scipy.io.loadmat(fname)
-        X = mat['X']
-        return X
-
-    def loadImageData(self, fname) -> np.array:
-        A = imageio.imread(fname)
-        logging.info(f"Size of data {A.shape}")
-        A = A / 255.0
-        img_size = np.shape( A )
-        X = A.reshape(img_size[0] * img_size[1], 3)
-        return X
-
-    # Normalize vectore by subtracting the mean and dividing by the standard deviation
-    # return the normalized data, mean, and std    
-    def featureNormalize(self,data):
-        print (f"shape of data is {data.shape}")
-        u = np.mean(data,axis=0) # take mean of each column
-        print (f"mean vec is {u}")
-        X_zero_mean = data - u
-        X_std = np.std(X_zero_mean,axis=0,ddof=1) # compute variance of each column
-        print (f"standard deviation is {X_std}")
-        X_norm = X_zero_mean / X_std
-
-        return X_norm, u, X_std
+        return   
 
     # Compute the principal components of a Matrix
     def pca(self,data):
         # Remove the mean and scale to N(0,1) before doing PCA
-        X,mu,X_std = self.featureNormalize(data)
+        X,mu,X_std = Utils.featureNormalize(data)
         X_cov = X.T.dot(X) / X.shape[0]
         U, S, V = np.linalg.svd(X_cov)
         print (f"PCA vecs are {U}")
@@ -67,7 +43,7 @@ class PCA:
         return X_recovered
 
     def run(self) -> None:
-        X = self.loadMatlabData("./Data/ex7data1.mat")
+        X = Utils.loadMatlabData("./Data/ex7data1.mat")
         print (f"first sample is {X[0]}")
         #self.plot2DData(X)
         X_norm,mu,X_std,U,S = self.pca(X)
@@ -78,7 +54,7 @@ class PCA:
         X_recovered = self.recoverData(X_low_dim,U,1)
         print (f"recovered data is {X_recovered[0]}") # Should be [-1.047 -1.047]
         self.plotProjectedData(X_norm,X_recovered)
-        img = self.loadMatlabData("./Data/ex7faces.mat")
+        img = Utils.loadMatlabData("./Data/ex7faces.mat")
         X_norm,mu,X_std,U,S = self.pca(img)
         # Scale from norm 1 PCA vector to [0,1]
         #self.displayImageData(U[:,:36].T * U.shape[0])
@@ -87,11 +63,11 @@ class PCA:
         X_rec = self.recoverData(Z,U,K)
         # Scale from normalized data to [0,1] for image display
         self.displayOrigAndReduced((X_norm + 2)*0.25,(X_rec + 2)*0.25,K)
-        img2 = self.loadImageData("./Data/bird_small.png")
+        img2 = Utils.loadImageData("./Data/bird_small.png")
         X_norm,mu,X_std,U,S = self.pca(img2)
         Z2 = self.projectData(X_norm,U,K)
         self.plotScatter(Z2,K)
-        logging.info(f"Completed Successfully")
+        logging.info(f"doPCA run Completed Successfully")
 
     def plot2DData(self,X) -> None:
         pyplot.plot( X[:, 0], X[:, 1], 'bo' )
