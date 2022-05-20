@@ -86,6 +86,7 @@ def part2_2():
 	num_movies 	 = 5
 
 	X 		= X[:num_movies, :num_features]
+	
 	theta 	= theta[:num_users, :num_features]
 	Y 		= Y[:num_movies, :num_users]
 	R 		= R[:num_movies, :num_users]
