@@ -53,9 +53,25 @@ plt.show()
 # E[total_cost_A] = cost_A + cost_defect * E[p | alpha_post_A, beta_post_A]
 E_total_cost_A = packaging_cost_A + defect_cost_A * beta_rv_A.expect()
 
+# Credible interval for the posterior distribution of A test.
+E_total_cost_A_low, E_total_cost_A_high = \
+    packaging_cost_A + defect_cost_A * np.array(beta_rv_A.interval(0.95))
+
+# Results
+formatted_A = "{:.2f}".format(E_total_cost_A) + \
+    " (" + "{:.2f}".format(E_total_cost_A_low) + ", " + \
+    "{:.2f}".format(E_total_cost_A_high) + ")"
+print("Expected true cost of packaging A:", formatted_A)
+
 # Expected cost of using packaging B.
 E_total_cost_B = packaging_cost_B + defect_cost_B * beta_rv_B.expect()
 
+# Credible interval for the posterior distribution of B test.
+E_total_cost_B_low, E_total_cost_B_high = \
+    packaging_cost_B + defect_cost_B * np.array(beta_rv_B.interval(0.95))
+
 # Results
-print("Expected true cost of packaging A:", E_total_cost_A)
-print("Expected true cost of packaging B:", E_total_cost_B)
+formatted_B = "{:.2f}".format(E_total_cost_B) + \
+    " (" + "{:.2f}".format(E_total_cost_B_low) + ", " + \
+    "{:.2f}".format(E_total_cost_B_high) + ")"
+print("Expected true cost of packaging B:", formatted_B)
