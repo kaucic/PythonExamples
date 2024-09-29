@@ -3,22 +3,26 @@ import numpy as np
 import pandas as pd
 import scipy as sp
 
+
+# 90% of the time went into reading the data properly.
 data = pd.read_csv("ab_test_data.csv", index_col=0, skip_blank_lines=True, skipinitialspace=True)
 
-a_test = data["A test"]
-b_test = data["B test"]
 
+a_test = data["A test"]
 number_of_samples_A = a_test.iloc[0]
 number_or_defects_A = a_test.iloc[1]
 packaging_cost_A = a_test.iloc[2]
 defect_cost_A = a_test.iloc[3]
 
+b_test = data["B test"]
 number_of_samples_B = b_test.iloc[0]
 number_or_defects_B = b_test.iloc[1]
 packaging_cost_B = b_test.iloc[2]
 defect_cost_B = b_test.iloc[3]
 
 # Parameters of the prior beta distribution for both A and B tests.
+# With this parameters, we have a non-informative prior. In any case,
+# the prior is overwhelmed by the data, so this choice is not very important.
 alpha = 0.5
 beta = 0.5
 
