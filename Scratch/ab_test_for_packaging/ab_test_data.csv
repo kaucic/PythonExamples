@@ -1,0 +1,5 @@
+    ,               A test, B test
+number of samples,  1000,   2000
+number of defects,  50,     110
+packaging cost,     2.0,    1.0
+defect cost,        1000.0, 1000.0
