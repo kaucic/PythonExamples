@@ -328,34 +328,26 @@ def plot_expected_value_function(i, N, method, rewards):
 
 # Start main program
 if __name__ == "__main__":
-    for method in ["approx", "recurse"]:
-        rewards = list(range(0, 301, 25))
-        reward, E = plot_expected_value_function(1, 3, method, rewards)
-
-        rewards = list(range(0, 401, 50))
-        reward, E = plot_expected_value_function(2, 3, method, rewards)
-
-        rewards = list(range(150, 601, 50))
-        reward, E = plot_expected_value_function(3, 3, method, rewards)
-
     if True:
-        rewards = list(range(0, 301, 25))
-        reward, E = plot_expected_value_function(1, 3, rewards)
+        for method in ["approx", "recurse"]:
+            rewards = list(range(0, 301, 25))
+            reward, E = plot_expected_value_function(1, 3, method, rewards)
 
-        rewards = list(range(0, 401, 50))
-        reward, E = plot_expected_value_function(2, 3, rewards)
+            rewards = list(range(0, 401, 50))
+            reward, E = plot_expected_value_function(2, 3, method, rewards)
 
-        rewards = list(range(150, 601, 50))
-        reward, E = plot_expected_value_function(3, 3, rewards)
+            rewards = list(range(150, 601, 50))
+            reward, E = plot_expected_value_function(3, 3, method, rewards)
+
     else:
         rewards = list(range(0, 401, 25))
-        reward, E = plot_expected_value_function(1, 4, rewards)
+        reward, E = plot_expected_value_function(1, 4, method, rewards)
 
         rewards = list(range(0, 401, 50))
-        reward, E = plot_expected_value_function(2, 4, rewards)
+        reward, E = plot_expected_value_function(2, 4, method, rewards)
 
         rewards = list(range(50, 1001, 50))
-        reward, E = plot_expected_value_function(3, 4, rewards)
+        reward, E = plot_expected_value_function(3, 4, method, rewards)
 
         rewards = list(range(200, 1001, 50))
-        reward, E = plot_expected_value_function(4, 4, rewards)
+        reward, E = plot_expected_value_function(4, 4, method, rewards)

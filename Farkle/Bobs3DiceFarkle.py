@@ -28,8 +28,22 @@
 # 2 -- 44.44%
 # 1 -- 66.67%
 
+import sys
 import numpy as np
+import logging
 # import pdb
+
+# use Python logging package
+# set level to DEBUG (10)
+def setup_logger(logging_level):
+      global _logger
+      
+      _logger = logging.getLogger()
+      handler = logging.StreamHandler(sys.stdout)
+      handler.setFormatter(logging.Formatter("[%(levelname)s]\t%(filename)s:%(lineno)s\t%(message)s"))
+      _logger.addHandler(handler)
+
+      _logger.setLevel(logging_level)
 
 # Works for 3 or less dice
 # dice_vals are a vector of 1-N dice, all containing a value of 1 to 6
@@ -76,14 +90,15 @@ def EvaluateResult(dice_vals):
     return score
     
 class Dice:
-    def __init__(self, N = 3, seed = None):
+    def __init__(self, N = 3, debug = False, seed = None):
         self._N = N
+        self._debug = debug
         if seed is not None:
             self.Reset(seed)
 
     def Roll(self):
         dice_vals = np.random.randint(1,6,self._N)
-        if debug:
+        if self._debug:
             print ("You rolled ", dice_vals)
         return dice_vals
 
@@ -296,45 +311,52 @@ class ConservativePlayer(Player):
         return self._total_reward
 
 # Start of main program        
-debug = False     
-        
-consvy = ConservativePlayer(debug)
-greedy = GreedyPlayer(debug)
-smarty = OptimalPlayer(debug)
+def main():
+    debug = False
+    LOGGING_LEVEL = 10
+         
+    setup_logger(LOGGING_LEVEL)
+            
+    consvy = ConservativePlayer(debug)
+    greedy = GreedyPlayer(debug)
+    smarty = OptimalPlayer(debug)
+    
+    consvy_tp = 0.0
+    greedy_tp = 0.0
+    smarty_tp = 0.0
+    
+    # Play a few turns
+    N_turns = 10
+    for i in range(N_turns):
+        if True:
+            print("Turn %d" % (i + 1))
+    
+        consvy_score = consvy.DoTurn()
+        consvy_tp += consvy_score
+    
+        if debug:
+            print("Consvy Total reward is %d" % consvy._total_reward)
+            print("******************")
+    
+        greedy_score = greedy.DoTurn()
+        greedy_tp += greedy_score
+    
+        if debug:
+            print ("Greedy Total reward is %d" % greedy._total_reward)
+            print("******************")
+    
+        smarty_score = smarty.DoTurn()
+        smarty_tp += smarty_score
+    
+        if debug:
+            print ("Smarty Total reward is %d" % smarty._total_reward)
+            print("******************")
+    
+    print("")
+    print("Greedy player point's per roll: %f" % (1.0*greedy_tp/N_turns))
+    print("Optimal player point's per roll: %f" % (1.0*smarty_tp/N_turns))
+    print("Conservative player point's per roll: %f" % (1.0*consvy_tp/N_turns))
 
-consvy_tp = 0.0
-greedy_tp = 0.0
-smarty_tp = 0.0
-
-# Play a few turns
-N_turns = 10
-for i in range(N_turns):
-    if True:
-        print("Turn %d" % (i + 1))
-
-    consvy_score = consvy.DoTurn()
-    consvy_tp += consvy_score
-
-    if debug:
-        print("Consvy Total reward is %d" % consvy._total_reward)
-        print("******************")
-
-    greedy_score = greedy.DoTurn()
-    greedy_tp += greedy_score
-
-    if debug:
-        print ("Greedy Total reward is %d" % greedy._total_reward)
-        print("******************")
-
-    smarty_score = smarty.DoTurn()
-    smarty_tp += smarty_score
-
-    if debug:
-        print ("Smarty Total reward is %d" % smarty._total_reward)
-        print("******************")
-
-print("")
-print("Greedy player point's per roll: %f" % (1.0*greedy_tp/N_turns))
-print("Optimal player point's per roll: %f" % (1.0*smarty_tp/N_turns))
-print("Conservative player point's per roll: %f" % (1.0*consvy_tp/N_turns))
-
+if __name__ == '__main__':
+    main()
+    

@@ -5,8 +5,10 @@
 import sys
 
 '''For scientific computing'''
-from numpy import *
+#from numpy import *
+import numpy as np
 import scipy.misc, scipy.io, scipy.optimize
+from PIL import Image
 import imageio
 
 '''For plotting'''
@@ -15,31 +17,29 @@ from mpl_toolkits.mplot3d import Axes3D
 
 from util import Util
 from timeit import Timer
-from sklearn.decomposition import RandomizedPCA
+from sklearn.decomposition import PCA as RandomizedPCA
 
 from ex7 import *
 
 
 def displayData( X ):
 	width = 32
-	rows = cols = int(sqrt( shape(X)[0] ))
-	
-	out = zeros(( width * rows, width * cols ))
+	rows = cols = int(np.sqrt( shape(X)[0] ))
+	out = np.zeros(( width * rows, width * cols ))
 
-	
 	counter = 0
 	for y in range(0, rows):
 		for x in range(0, cols):
 			start_x = x * width
 			start_y = y * width
-			out[start_x:start_x+width, start_y:start_y+width] = X[counter].reshape( width, width ).T
+			out[start_x:start_x+width, start_y:start_y+width] = X[counter].reshape( width, width ).T * 255
 			counter += 1
 
-	img = scipy.misc.toimage( out )
+	#img = scipy.misc.toimage( out )
+	img = Image.fromarray( out )
 	axes 	= pyplot.gca()
 	figure 	= pyplot.gcf()
 	axes.imshow( img ).set_cmap( 'gray' )
-
 
 def pca( X ):
 	covariance 	= X.T.dot( X ) / shape( X )[0]
@@ -104,6 +104,7 @@ def part2_3():
 	print (Z[0]) # Should be 1.481
 
 	X_rec = recoverData( Z, U, K )
+	print (X_rec[0]) # Should be [-1.047 -1.047]
 
 	for i in range( 0, shape( X_rec)[0] ):
 		pyplot.gca().add_line( lines.Line2D( xdata=[X_norm[i,0], X_rec[i,0]], ydata=[X_norm[i,1], X_rec[i,1]], c='g', lw=1, ls='--' ) )	
@@ -126,7 +127,7 @@ def part2_4():
 	X_norm, mu, sigma = Util.featureNormalize( X )
 
 	U, S = pca( X_norm )
-	# displayData( U[:, :36].T )
+	#displayData( U[:, :36].T )
 
 	K = 100
 	Z = projectData( X_norm, U, K )
@@ -141,15 +142,15 @@ def part2_4():
 def partExtra():
     A = imageio.imread( "./Data/bird_small.png" )	
 	#A = scipy.misc.imread( "./Data/bird_small.png" )
-    A 			= A / 255.0
-    img_size 	= shape( A )
+    A = A / 255.0
+    img_size = shape( A )
     
     X = A.reshape( img_size[0] * img_size[1], 3 )
     K = 16
     max_iters = 10
     
-    initial_centroids = kMeansInitCentroids( X, K )
-    centroids, idx = runkMeans( X, initial_centroids, max_iters )
+    #initial_centroids = kMeansInitCentroids( X, K )
+    #centroids, idx = runkMeans( X, initial_centroids, max_iters )
     
     fig = pyplot.figure()
 	# axis = fig.add_subplot( 111, projection='3d' )
@@ -163,10 +164,10 @@ def partExtra():
     pyplot.show()
 
 def main():
-	part2_1()
-	part2_2()
-	part2_3()
-	part2_4()
+	#part2_1()
+	#part2_2()
+	#part2_3()
+	#part2_4()
 	partExtra()
 
 if __name__ == '__main__':

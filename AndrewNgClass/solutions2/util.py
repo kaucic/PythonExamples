@@ -96,8 +96,8 @@ class Util(object):
 						z2 = z3 - (0.5 * d3 * z3 * z3) / (d3 * z3 + f2 - f3)
 					else:
 						A = 6*(f2-f3)/z3+3*(d2+d3)                      # make cubic extrapolation
-					  	B = 3*(f3-f2)-z3*(d3+2*d2)
-					  	z2 = (sqrt(B*B-A*d2*z3*z3)-B)/A
+						B = 3*(f3-f2)-z3*(d3+2*d2)
+						z2 = (sqrt(B*B-A*d2*z3*z3)-B)/A
 					
 					if isnan( z2 ) or isinf( z2 ):
 						z2 = z3 / 2
@@ -123,16 +123,16 @@ class Util(object):
 				elif M == 0:
 					break
 
-			  	A = 6*(f2-f3)/z3+3*(d2+d3)                      # make cubic extrapolation
-			  	B = 3*(f3-f2)-z3*(d3+2*d2)
-			  	z2 = -d2*z3*z3/(B+sqrt(B*B-A*d2*z3*z3))        # num. error possible - ok!
-			  	
-			  	if not isreal(z2) or isnan(z2) or isinf(z2) or z2 < 0:
-			  		if limit < -0.5:
-			  			z2 = z1 * (EXT - 1)
-		  			else:
-		  				z2 = (limit - z1) / 2
-		  		elif (limit > -0.5) and (z2+z1 > limit):
+				A = 6*(f2-f3)/z3+3*(d2+d3)                      # make cubic extrapolation
+				B = 3*(f3-f2)-z3*(d3+2*d2)
+				z2 = -d2*z3*z3/(B+sqrt(B*B-A*d2*z3*z3))        # num. error possible - ok!
+	
+				if not isreal(z2) or isnan(z2) or isinf(z2) or z2 < 0:
+					if limit < -0.5:
+						z2 = z1 * (EXT - 1)
+					else:
+						z2 = (limit - z1) / 2
+				elif (limit > -0.5) and (z2+z1 > limit):
 					z2 = (limit-z1)/2
 				elif (limit < -0.5) and (z2+z1 > z1 * EXT ):
 					z2 = z1 * (EXT - 1.0)
@@ -210,8 +210,8 @@ class TestUtil(unittest.TestCase):
 		self.assertEqual( Util.sigmoid( 0 ), 0.5 )
 		
 def main():
-	print Util.sigmoid( array([0, 0, 1]) )
-	print Util.sigmoidGradient( array([0, 0, 1]) )
+	print (Util.sigmoid( array([0, 0, 1]) ))
+	print (Util.sigmoidGradient( array([0, 0, 1]) ))
 
 	# y = array([1, 2, 3, 4, 5, 6, 7, 8, 9])
 	# print Util.recodeLabel( y, 10 )
