@@ -1,0 +1,12 @@
+name: reinforcement-learning
+channels:
+  - defaults
+dependencies:
+  - python=3.12
+  - numpy
+  - pandas
+  - matplotlib
+  - jupyter
+  - pip
+  - pip:
+      # Add pip-only packages here if needed
