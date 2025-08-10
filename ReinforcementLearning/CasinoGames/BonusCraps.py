@@ -2,9 +2,9 @@
 """
 BonusCraps.py
 Template for a Python main program.
-Author: 
+Author: Bob Kaucic
 Date: 2025-08-09
-Description: Entry point for the Bonus Craps simulation or application.
+Description: Simulation and theoretical calculations for Bonus Craps (all Small, all Tall, and ALL numbers except 7)
 """
 
 import sys
@@ -14,23 +14,24 @@ import numpy as np
 
 def main() -> None:
     """
-    Main entry point for the Bonus Craps program.
+    Main entry point for the program.
     """
-    # Simulate millions of rolls
+   
     def check_for_win(rolled: list[bool]) -> bool:
         """
-        Check if the player has rolled all possible sums of two dice.
+        Check if the player has rolled all possible sums of two dice other than 7
         """
         #return all(rolled[2:7]) & all(rolled[8:13])
-        #return all(rolled[8:13]) 
-        return all(rolled[2:7])
-        #return all(rolled[2:5])
+        #return all(rolled[8:13]) # All Tall
+        return all(rolled[2:7])  # All Small
+        #return all(rolled[2:5]) # Just 2, 3, 4
     
+    # Simulate millions of turns
     number_of_wins = 0
     for i in range(1000000):
         win = False
         lose = False
-        # Initialize a boolean array 'rolled' of length 13 to False
+        # Initialize a boolean array for the 11 possible sums of two dice [2-12]
         rolled = [False] * 13
         while not (win or lose):
             # Simulate rolling two dice
@@ -50,12 +51,15 @@ def main() -> None:
             #print(f"You rolled a 7, you lose!")
     percent_win = number_of_wins / (i + 1) 
     odds = 1 / percent_win
-    expected_value = percent_win * 35 - 1
-    #expected_value = percent_win * 176 - 1
+    expected_value = percent_win * 35 - 1 # All Small and All Tall pay 35 for 1
+    #expected_value = percent_win * 176 - 1 # All Numbers pay 176 for 1
     print(f"{number_of_wins} wins out of {i+1} rolls = {percent_win} odds {odds}")
     print(f"Expected value = {expected_value}")
           
 def calculate_transition_probabilities234() -> float:
+    """
+    Determine the probability of rolling a 2, 3, and 4 before rolling a 7
+    """
     # Initialize the state transition matrix to 0
     A_ft = np.zeros((9, 9), dtype=float)
     A_ft[0] = [24,  1,  2,  3,  0,  0,  0,  0,  6]
@@ -86,9 +90,13 @@ def calculate_transition_probabilities234() -> float:
     print(s_2)
     print(s_3)      
     print(s_final)
+
     return s_final[7]
 
 def calculate_transition_probabilities() -> float:
+    """
+    Determine the probability of rolling All Small (2, 3, 4, 5, and 6 before rolling a 7)
+    """
     # Initialize the state transition matrix to 0
     A_ft = np.zeros((33, 33), dtype=float)
     A_ft[0]  = [15, 1, 2, 3, 4, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 6]
@@ -147,6 +155,7 @@ def calculate_transition_probabilities() -> float:
     print(s_2)
     print(s_3)      
     print(s_final)
+
     return s_final[31]
 
 if __name__ == "__main__":
@@ -155,5 +164,5 @@ if __name__ == "__main__":
     #print(f"Probability of winning 234: {prob_win}")
     prob_win = calculate_transition_probabilities()
     odds = 1 / prob_win
-    print(f"Probability of winning all small: {prob_win}, Odds: {odds}")
+    print(f"Probability of winning all Small: {prob_win}, Odds: {odds}")
 
